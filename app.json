@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "scheme": "acme",
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "name": "myFirstApp",
+    "slug": "myFirstApp",
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "55e19900-7d52-4f1a-91eb-97bdb1129a31"
+      }
+    }
+  }
+}
