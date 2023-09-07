@@ -1,13 +1,14 @@
 {
   "expo": {
     "scheme": "acme",
+    "icon": "./assets/images/Lockr.png",
     "web": {
       "bundler": "metro"
     },
     "plugins": [
       "expo-router"
     ],
-    "name": "myFirstApp",
+    "name": "Lockr",
     "slug": "myFirstApp",
     "extra": {
       "router": {
@@ -16,6 +17,9 @@
       "eas": {
         "projectId": "55e19900-7d52-4f1a-91eb-97bdb1129a31"
       }
+    },
+    "android": {
+      "package": "com.wilfredo_s.myFirstApp"
     }
   }
 }

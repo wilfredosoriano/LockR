@@ -53,11 +53,7 @@ const ConfirmEmailScreen = () => {
 
     return (
         <View style={styles.container}>
-        <Image
-          source={require('../../images/security.jpg')}
-          style={styles.image}
-          resizeMode="contain"
-        />
+
         <Text style={styles.title}>Confirm Code</Text>
 
         <CustomInput name="code" placeholder="Code" control={control}/>
@@ -76,7 +72,7 @@ const styles = StyleSheet.create({
     container: {
       flex: 1,
       alignItems: 'center',
-      
+      justifyContent:'center'
     },
     image: {
         marginBottom: 20,

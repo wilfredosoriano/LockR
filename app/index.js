@@ -16,20 +16,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#09055D',
   },
-  main: {
-    flex: 1,
-    justifyContent: "center",
-    maxWidth: 960,
-    marginHorizontal: "auto",
-  },
-  title: {
-    fontSize: 64,
-    fontWeight: "bold",
-  },
-  subtitle: {
-    fontSize: 36,
-    color: "#38434D",
-  },
 });
 
 

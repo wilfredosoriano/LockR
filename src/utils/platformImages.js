@@ -27,5 +27,17 @@ export const PLATFORM_IMAGES = {
     instagram: {
         imgName: 'Instagram', 
         uri: require('../images/instagram.jpg')
-      }
+      },
+    security: {
+        imgName: 'Security',
+        uri: require('../images/security.png')
+    },
+    mobile: {
+        imgName: 'Mobile',
+        uri: require('../images/mobile-legends.png')
+    },
+    lazada: {
+        imgName: 'Lazada',
+        uri: require('../images/lazada.png')
+    }
   }

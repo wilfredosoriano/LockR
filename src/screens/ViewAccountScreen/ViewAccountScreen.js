@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Text, TouchableOpacity, Image, Modal } from 'react-native';
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faEllipsisV, faEye, faClone, faTrashAlt, faEyeSlash, faEdit, faChevronCircleLeft, faTimesCircle } from "@fortawesome/free-solid-svg-icons";
+import { View, StyleSheet, Text, TouchableOpacity, Image, Modal, ToastAndroid } from 'react-native';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { TextInput } from "react-native-gesture-handler";
 import { showMessage, hideMessage } from "react-native-flash-message";
 import * as Clipboard from 'expo-clipboard';
-import { doc, deleteDoc, updateDoc } from "firebase/firestore";
+import { doc, deleteDoc, updateDoc, addDoc, collection } from "firebase/firestore";
 import { FIREBASE_FIRESTORE } from "../../../Firebaseconfig";
 import { PLATFORM_IMAGES } from "../../utils/platformImages";
-import CryptoJS from "crypto-js";
+import { Ionicons } from "@expo/vector-icons";
+import { getAuth } from "firebase/auth";
+import * as LocalAuthentication from 'expo-local-authentication';
 
 const ViewAccountScreen = () => {
     const route = useRoute();
     const navigation = useNavigation();
+
+    const auth = getAuth();
 
     const selectedItem = route.params?.selectedItem;
     
@@ -42,13 +44,6 @@ const ViewAccountScreen = () => {
             setPasswordStrength('Weak');
         }
     };
-
-    const handleItemEdit = (item) => {
-        setSelectedEditItem(item);
-        setEditUsername(item.username);
-        setEditPassword(item.password);
-        setModalVisible(true);
-    }; 
 
     const handleBack = () => {
         navigation.navigate('Home');
@@ -93,14 +88,57 @@ const ViewAccountScreen = () => {
         setDropdownVisible(false);
     };
 
-    const deleteItem = async (itemId) => {
+    const logHistory = async (action, timestamp) => {
         try {
-            // Delete from Firestore
-            await deleteDoc(doc(FIREBASE_FIRESTORE, 'accounts', itemId));
-            // Update state to remove the deleted item from the UI
-            //setSortedAccounts((prevAccounts) => prevAccounts.filter((account) => account.id !== itemId));
+          const user = auth.currentUser;
+          await addDoc(collection(FIREBASE_FIRESTORE, 'history'), {
+            userId: user.uid,
+            action,
+            timestamp,
+          });
+          console.log('History log added:', action);
         } catch (error) {
-            console.error('Error deleting item:', error);
+          console.error('Error logging history:', error);
+        }
+      };
+
+    const deleteItem = async (itemId) => {
+        const isAuthenticated = await authenticateWithBiometrics();
+        if (isAuthenticated) {
+            try {
+                const createdAt = new Date();
+    
+                await logHistory('Deleted Account', createdAt);
+                    
+                ToastAndroid.show('Account deleted', ToastAndroid.SHORT);
+                await deleteDoc(doc(FIREBASE_FIRESTORE, 'accounts', itemId));
+                navigation.navigate('Home');
+            } catch (error) {
+                console.error('Error deleting item:', error);
+            }
+        } else {
+            ToastAndroid.show('Authenticate first to delete your account', ToastAndroid.SHORT);
+        }
+    };
+
+    const authenticateWithBiometrics = async () => {
+        try {
+            const hasBiometrics = await LocalAuthentication.hasHardwareAsync();
+            if (hasBiometrics) {
+                    await LocalAuthentication.isEnrolledAsync();
+                    const result = await LocalAuthentication.authenticateAsync({
+                        promptMessage: 'Authenticate to delete your account',
+                    });
+                    if (result.success) {
+                        return true;
+                    } else {
+                        console.log('Biometric authentication failed');
+                    }
+            } else {
+                console.log('Biometric hardware is not available');
+            }
+        } catch (error) {
+            console.error('Error during biometric authentication:', error);
         }
     };
     
@@ -110,12 +148,12 @@ const ViewAccountScreen = () => {
             <View style={styles.header}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={handleBack}>
-                        <FontAwesomeIcon icon={ faChevronCircleLeft } size={24} style={{color: '#018FF8'}}/>
+                        <Ionicons name="arrow-back-circle-outline" size={30}/>
                     </TouchableOpacity>
                     <Text style={styles.passwordDetail}>Password Detail</Text>
                 </View>
                 <TouchableOpacity onPress={toggleDropdown}>
-                    <FontAwesomeIcon icon={ faEllipsisV } size={24}/>
+                    <Ionicons name="ellipsis-vertical-outline" size={30}/>
                 </TouchableOpacity>
                 <Modal
                     animationType="fade"
@@ -128,8 +166,8 @@ const ViewAccountScreen = () => {
                                 <FontAwesomeIcon icon={faEdit} size={18} style={styles.dropdownIcon} />
                                 <Text style={styles.dropdownText}>Edit Account</Text>
                             </TouchableOpacity>*/}
-                            <TouchableOpacity style={styles.dropdownItem} onPress={() => {setDropdownVisible(false); deleteItem(selectedItem.id); navigation.navigate('Home');}}>
-                                <FontAwesomeIcon icon={faTrashAlt} size={18} style={styles.dropdownIcon} />
+                            <TouchableOpacity style={styles.dropdownItem} onPress={() => {setDropdownVisible(false); deleteItem(selectedItem.id);}}>
+                                <Ionicons name="trash-outline" size={24}/>
                                 <Text style={styles.dropdownText}>Delete Account</Text>
                             </TouchableOpacity>
                         </View>
@@ -167,7 +205,7 @@ const ViewAccountScreen = () => {
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                 <Text style={{fontSize: 18, maxWidth: 220}}>{selectedItem.username}</Text>
                 <TouchableOpacity onPress={handleCopyPassword2}>
-                    <FontAwesomeIcon icon={ faClone } size={18} style={{color: 'gray', marginHorizontal: 10}}/>
+                    <Ionicons name="copy-outline" size={20}/>
                 </TouchableOpacity>
                 </View>
 
@@ -180,14 +218,14 @@ const ViewAccountScreen = () => {
                         )}
                         <View style={{flexDirection: 'row'}}>
                             <TouchableOpacity onPress={() => togglePasswordVisibility(selectedItem.id)}>
-                                <FontAwesomeIcon
-                                        icon={showPasswords[selectedItem.id] ? faEyeSlash : faEye}
-                                        size={18}
-                                        style={{ color: 'gray' }}
-                                    />
+                                {showPasswords[selectedItem.id] ? (
+                                    <Ionicons name="eye-outline" size={20} style={{marginRight: 5}}/>
+                                ) : (
+                                    <Ionicons name="eye-off-outline" size={20} style={{marginRight: 5}}/>
+                                )}
                             </TouchableOpacity>
                             <TouchableOpacity onPress={handleCopyPassword}>
-                                <FontAwesomeIcon icon={ faClone } size={18} style={{color: 'gray', marginHorizontal: 10}}/>
+                                <Ionicons name="copy-outline" size={20}/>
                             </TouchableOpacity>
                         </View>
                 </View>
@@ -206,66 +244,6 @@ const ViewAccountScreen = () => {
             </View>
             </View>
 
-            <Modal
-                    animationType="fade"
-                    transparent={true}
-                    visible={modalVisible}
-                    onRequestClose={() => {
-                    setModalVisible(!modalVisible);
-                    }}
-                >
-                    <View style={styles.modalContainer}>
-                        <View style={[styles.modalContent]}>
-                            {/* Add your edit content here */}
-                            <View style={{alignItems: 'flex-end'}}>
-                                <TouchableOpacity onPress={() => setModalVisible(false)}>
-                                    <FontAwesomeIcon icon={ faTimesCircle } size={24} style={styles.icon}/>
-                                </TouchableOpacity>
-                            </View>
-                            <View style={{alignItems: 'center'}}>
-                                <Text style={{fontSize: 16, marginBottom: 20, fontWeight: 'bold'}}>Edit Account Details</Text>
-                                <TextInput
-                                style={styles.addAccountContainer}
-                                placeholder="Username/Email"
-                                value={editUsername}
-                                onChangeText={setEditUsername}
-                                />
-                                <TextInput
-                                style={styles.addAccountContainer}
-                                placeholder="Password"
-                                value={editPassword}
-                                onChangeText={setEditPassword}
-                                />
-                                <View style={styles.modalButton}>
-                                        <TouchableOpacity
-                                            onPress={async () => {
-                                                try {
-                                                    
-                                                    const docRef = doc(FIREBASE_FIRESTORE, 'accounts', selectedEditItem.id);
-                                                    await updateDoc(docRef, {
-                                                      username: editUsername,
-                                                      password: CryptoJS.AES.encrypt(
-                                                        JSON.stringify({ passwordValue: editPassword }),
-                                                        'secret'
-                                                      ).toString(),
-                                                    });
-                                                
-                                                    
-                                                    setModalVisible(false);
-                                                    setEditUsername('');
-                                                    setEditPassword('');
-                                                  } catch (error) {
-                                                    console.error('Error updating document:', error);
-                                                  }
-                                            }}
-                                            style={{ borderWidth: 1, borderRadius: 30, paddingTop: 5, paddingBottom: 5, paddingLeft: 10, paddingRight: 10 }}>
-                                            <Text style={{ fontSize: 15, color: 'black' }}>Confirm</Text>
-                                        </TouchableOpacity>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                </Modal>
         </View>
     )
 }

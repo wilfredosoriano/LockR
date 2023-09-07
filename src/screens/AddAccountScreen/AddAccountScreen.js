@@ -1,7 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { View, StyleSheet, Text, TouchableOpacity, Image, Modal } from 'react-native';
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faChevronCircleLeft, faEllipsisV, faEye, faEyeSlash, faClone, faTrashAlt, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { View, StyleSheet, Text, TouchableOpacity, Image, Modal, ToastAndroid, ActivityIndicator } from 'react-native';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { TextInput } from "react-native-gesture-handler";
 import { showMessage, hideMessage } from "react-native-flash-message";
@@ -10,9 +8,8 @@ import { doc, deleteDoc, addDoc, collection } from "firebase/firestore";
 import { FIREBASE_FIRESTORE, FIREBASE_AUTH } from "../../../Firebaseconfig";
 import { getAuth } from "firebase/auth";
 import CryptoJS from 'crypto-js';
-//import { useFonts, OpenSans_400Regular } from "@expo-google-fonts/open-sans";
-import { useFonts } from "expo-font";
 import { SelectList } from "react-native-dropdown-select-list";
+import { Ionicons } from "@expo/vector-icons";
 
 
 const AddAccountScreen = () => {
@@ -27,18 +24,18 @@ const AddAccountScreen = () => {
 
     const selectedItem = route.params?.selectedItem;
 
-    const[visible, setVisible] = useState(false);
     const [dropdownVisible, setDropdownVisible] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
 
     const [showPassword, setShowPassword] = useState(false);
-
-    const [titleValue, setTitleValue] = useState('');
     const [usernameValue, setUsernameValue] = useState('');
     const [passwordValue, setPasswordValue] = useState('');
 
     const [selectedPlatform, setSelectedPlatform] = useState('');
 
     const [passwordStrength, setPasswordStrength] = useState('');
+
 
     const evaluatePasswordStrength = (password) => {
         
@@ -63,13 +60,15 @@ const AddAccountScreen = () => {
         {key:'4', value:'Twitter'},
         {key:'5', value:'Shopee'},
         {key:'6', value:'Instagram'},
+        {key:'7', value:'Moonton'},
+        {key:'8', value:'Lazada'},
     ]
 
     const handlePlatformSelect = (selectedPlatform) => {
       
       setSelectedPlatform(selectedPlatform);
     };
-
+      
     const handleBack = () => {
         navigation.navigate('Home');
     }
@@ -121,7 +120,23 @@ const AddAccountScreen = () => {
         }
     };
 
+    const logHistory = async (action, timestamp) => {
+        try {
+          const user = auth.currentUser;
+          await addDoc(collection(FIREBASE_FIRESTORE, 'history'), {
+            userId: user.uid,
+            action,
+            timestamp,
+          });
+          console.log('History log added:', action);
+        } catch (error) {
+          console.error('Error logging history:', error);
+        }
+      };
+      
+
     const handleAddAccount = async () => {
+        setIsLoading(true);
 
         if (!selectedPlatform || !usernameValue || !passwordValue) {
             showMessage({
@@ -133,6 +148,7 @@ const AddAccountScreen = () => {
                 floating: true,
                 icon: { icon: "danger", position: "left" },
             });
+            setIsLoading(false);
             return;
         }
 
@@ -149,13 +165,17 @@ const AddAccountScreen = () => {
                     userId: user.uid,
                 });
 
+                await logHistory('Added Account', createdAt);
+                
                 console.log('Document written with ID: ', userDocRef.id);
+                ToastAndroid.show('Account added', ToastAndroid.SHORT);
 
-                setTitleValue('');
                 setUsernameValue('');
                 setPasswordValue('');
+                setIsLoading(false);
             } catch (error) {
                 console.error('Error adding document: ', error);
+                setIsLoading(false);
             }
         } catch (error) {
             console.error('Error hashing password: ', error);
@@ -168,13 +188,10 @@ const AddAccountScreen = () => {
             <View style={styles.header}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity onPress={handleBack}>
-                        <FontAwesomeIcon icon={ faChevronCircleLeft } size={24} style={{color: '#018FF8'}}/>
+                        <Ionicons name="arrow-back-circle-outline" size={30}/>
                     </TouchableOpacity>
                     <Text style={styles.passwordDetail}>Add Account</Text>
                 </View>
-                <TouchableOpacity onPress={toggleDropdown}>
-                    <FontAwesomeIcon icon={ faEllipsisV } size={24} style={{color: '#018FF8'}}/>
-                </TouchableOpacity>
                 <Modal
                     animationType="fade"
                     transparent={true}
@@ -183,7 +200,7 @@ const AddAccountScreen = () => {
                     <TouchableOpacity style={styles.modalContainer} activeOpacity={11} onPress={handleTouchablePress}>
                         <View style={styles.dropdownContainer}>
                             <TouchableOpacity style={styles.dropdownItem} onPress={() => {setDropdownVisible(false); deleteItem(selectedItem.id); navigation.navigate('Home');}}>
-                                <FontAwesomeIcon icon={faTrashAlt} size={18} style={styles.dropdownIcon} />
+                                
                                 <Text style={styles.dropdownText}>Delete Account</Text>
                             </TouchableOpacity>
                         </View>
@@ -203,7 +220,7 @@ const AddAccountScreen = () => {
                     value={usernameValue}
                     onChangeText={setUsernameValue}></TextInput>
                     <TouchableOpacity onPress={handleCopyPassword2}>
-                        <FontAwesomeIcon icon={ faClone } size={18} style={{color: 'gray', marginHorizontal: 10}}/>
+                        <Ionicons name="copy-outline" size={20}/>
                     </TouchableOpacity>
                 </View>
                 <View style={styles.inputBox}>
@@ -213,21 +230,30 @@ const AddAccountScreen = () => {
                 onChangeText={handlePasswordChange}></TextInput>
                     <View style={{flexDirection: 'row'}}>
                         <TouchableOpacity onPress={togglePasswordVisibility}>
-                            <FontAwesomeIcon
-                                icon={showPassword ? faEyeSlash : faEye}
-                                size={18}
-                                style={{ color: 'gray' }}
-                            />
+                        {showPassword ? (
+                                <Ionicons name="eye-outline" size={20} style={{marginRight: 5}}/>
+                            ) : (
+                                <Ionicons name="eye-off-outline" size={20} style={{marginRight: 5}}/>
+                            )}
                         </TouchableOpacity>
                         <TouchableOpacity onPress={handleCopyPassword}>
-                            <FontAwesomeIcon icon={ faClone } size={18} style={{color: 'gray', marginHorizontal: 10}}/>
+                            <Ionicons name="copy-outline" size={20}/>
                         </TouchableOpacity>
                     </View>
                 </View>
                 <TouchableOpacity
                     onPress={handleAddAccount}>
-                <View style={{backgroundColor: 'transparent', borderWidth: 1, marginVertical: 10 , alignItems: 'center', padding: 15, borderRadius: 10, borderColor: '#018FF8'}}>
-                    <Text style={{color: '#018FF8'}}>ADD</Text>
+                <View style={{backgroundColor: 'transparent', marginVertical: 10 , alignItems: 'center', padding: 15, borderRadius: 30, backgroundColor: '#018FF8', flexDirection: 'row', justifyContent: 'center'}}>
+                    <View style={{color: 'white', flexDirection: 'row', alignItems: 'center'}}>
+                    {isLoading ? (
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                    ) : (
+                    <>  
+                        <Ionicons name="add-circle-outline" color="white" size={20} style={{ marginRight: 5 }} />
+                        <Text style={{ color: 'white' }}>ADD</Text>
+                    </>
+                    )}
+                    </View>
                 </View>
                 </TouchableOpacity>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>

@@ -23,11 +23,7 @@ const NewPasswordScreen = () => {
 
     return (
         <View style={styles.container}>
-        <Image
-          source={require('../../images/security.jpg')}
-          style={styles.image}
-          resizeMode="contain"
-        />
+
         <Text style={styles.title}>New Password</Text>
 
         <CustomInput name="code" placeholder="Code" control={control} rules={{required: 'Code is required*'}}/>
@@ -52,7 +48,7 @@ const styles = StyleSheet.create({
     container: {
       flex: 1,
       alignItems: 'center',
-      
+      justifyContent: 'center'
     },
     image: {
         marginBottom: 20,

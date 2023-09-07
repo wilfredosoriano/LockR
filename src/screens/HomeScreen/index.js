@@ -1,38 +1,38 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, Image, StyleSheet, FlatList, Switch } from 'react-native';
+import { View, Text, Image, StyleSheet, FlatList, Switch, TouchableOpacity, ToastAndroid, BackHandler, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from "react-native-safe-area-context";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { faCog, faSearch, faSortAmountDown, faQuestionCircle, faLightbulb, faEdit, faPlusCircle, faEye, faTimesCircle, faChevronCircleRight, faKey, faHistory} from "@fortawesome/free-solid-svg-icons";
 import { ScrollView, TextInput } from "react-native-gesture-handler";
-import { TouchableOpacity, Modal } from "react-native";
-import { FIREBASE_FIRESTORE,FIREBASE_AUTH } from "../../../Firebaseconfig";
+import { FIREBASE_FIRESTORE } from "../../../Firebaseconfig";
 import BottomSheet from 'react-native-raw-bottom-sheet';
-import { collection, addDoc, getDocs, doc, onSnapshot, deleteDoc, updateDoc } from "firebase/firestore";
+import { collection, getDoc, doc, onSnapshot, addDoc, getDocs, query, where } from "firebase/firestore";
 import CryptoJS from 'crypto-js';
-import { useNavigation } from "@react-navigation/native";
-import Biometrics from "react-native-biometrics";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import * as LocalAuthentication from 'expo-local-authentication';
 import { PLATFORM_IMAGES } from "../../utils/platformImages";
-import { getAuth } from "firebase/auth";
-
+import { getAuth, signOut, updateProfile } from "firebase/auth";
+import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import ProfileImageUpload from "./ProfileImageUpload";
+import LoadingOverlay from "../../components/LoadingOverlay";
 
 
 const HomeScreen = () => {
 
-
     //const randomBytes = CryptoJS.lib.WordArray.random(32);
 
     //const secretKey = randomBytes.toString(CryptoJS.enc.Hex);
-
     const auth = getAuth();
+    const user = auth.currentUser;
+    const userUID = user ? user.uid : null;
 
     const navigation = useNavigation();
+    const route = useRoute();
 
     const bottomSheetRef = useRef(null);
 
     const [showPasswords, setShowPasswords] = useState({});
-
-    const [selectedItem, setSelectedItem] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading2, setIsLoading2] = useState(false);
 
     const [sortMode, setSortMode] = useState('date'); 
     const [sortedAccounts, setSortedAccounts] = useState([]);
@@ -40,10 +40,204 @@ const HomeScreen = () => {
 
     const [biometricEnabled, setBiometricEnabled] = useState(false);
 
+    const [userFirstName, setUserFirstName] = useState("");
+    const [shouldExitApp, setShouldExitApp] = useState(false);
+
+    const [likeCount, setLikeCount] = useState(0);
+    const [likeCount2, setLikeCount2] = useState(0);
+    const [likeCount3, setLikeCount3] = useState(0);
+
+    useEffect(() => {
+        // Create a reference to the "likes" collection
+        const likesCollectionRef = collection(FIREBASE_FIRESTORE, 'likes');
+
+        // Create a query to get likes for "item2"
+        const likesQuery = query(
+            likesCollectionRef,
+            where('itemId', '==', 'item2') // Replace with the actual item ID
+        );
+
+        // Subscribe to real-time updates for the likes query
+        const unsubscribe = onSnapshot(likesQuery, (querySnapshot) => {
+            // Update the like count based on the number of documents in the snapshot
+            setLikeCount(querySnapshot.size);
+        });
+
+        // Clean up the listener when the component unmounts
+        return () => {
+            unsubscribe();
+        };
+    }, []);
+
+    useEffect(() => {
+        // Create a reference to the "likes" collection
+        const likesCollectionRef = collection(FIREBASE_FIRESTORE, 'likes');
+
+        // Create a query to get likes for "item2"
+        const likesQuery = query(
+            likesCollectionRef,
+            where('itemId', '==', 'item1') // Replace with the actual item ID
+        );
+
+        // Subscribe to real-time updates for the likes query
+        const unsubscribe = onSnapshot(likesQuery, (querySnapshot) => {
+            // Update the like count based on the number of documents in the snapshot
+            setLikeCount2(querySnapshot.size);
+        });
+
+        // Clean up the listener when the component unmounts
+        return () => {
+            unsubscribe();
+        };
+    }, []);
+
+    useEffect(() => {
+        // Create a reference to the "likes" collection
+        const likesCollectionRef = collection(FIREBASE_FIRESTORE, 'likes');
+
+        // Create a query to get likes for "item2"
+        const likesQuery = query(
+            likesCollectionRef,
+            where('itemId', '==', 'item3') // Replace with the actual item ID
+        );
+
+        // Subscribe to real-time updates for the likes query
+        const unsubscribe = onSnapshot(likesQuery, (querySnapshot) => {
+            // Update the like count based on the number of documents in the snapshot
+            setLikeCount3(querySnapshot.size);
+        });
+
+        // Clean up the listener when the component unmounts
+        return () => {
+            unsubscribe();
+        };
+    }, []);
+    
+    
+
+
+    const handleBackPress = () => {
+        if (shouldExitApp) {
+          // If the user presses the back button again within a certain time frame, exit the app
+          BackHandler.exitApp();
+        } else {
+          // Show a toast message to inform the user to press again to exit
+          ToastAndroid.show('Press back again to exit', ToastAndroid.SHORT);
+      
+          // Set shouldExitApp to true to enable the exit behavior on the next back press
+          setShouldExitApp(true);
+      
+          // Reset shouldExitApp after a certain time frame (e.g., 2 seconds)
+          setTimeout(() => {
+            setShouldExitApp(false);
+          }, 2000); // Adjust the duration as needed
+        }
+      
+        // Return true to prevent the default behavior (navigating back)
+        return true;
+      };      
+
+    useEffect(() => {
+    // Add the back button listener
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+    
+    // Remove the listener when the component unmounts
+    return () => {
+        backHandler.remove();
+    };
+    }, [shouldExitApp]);
+
+    const logHistory = async (action, timestamp) => {
+        try {
+          const user = auth.currentUser;
+          await addDoc(collection(FIREBASE_FIRESTORE, 'history'), {
+            userId: user.uid,
+            action,
+            timestamp,
+          });
+          console.log('History log added:', action);
+        } catch (error) {
+          console.error('Error logging history:', error);
+        }
+      };
+
+    const handleLogout = async () => {
+        setIsLoading2(true);
+        try {
+            await AsyncStorage.removeItem('user');
+
+            const createdAt = new Date();
+
+            await logHistory('Logged out', createdAt);
+
+          await signOut(auth);
+          ToastAndroid.show('Logout Successful', ToastAndroid.SHORT);
+          setIsLoading2(false);
+          navigation.navigate('Login');
+        } catch (error) {
+          console.error('Logout Error:', error.message);
+        }
+      };      
 
     const handleItemAdd = () => {
         navigation.navigate('AddAccount');
     }
+    const handleHistory = () => {
+        navigation.navigate('History');
+    }
+    const handleGenerate = () => {
+        navigation.navigate('GeneratePassword');
+    }
+    const item1 = () => {
+        navigation.navigate('ViewItem1');
+    }
+    const item2 = () => {
+        navigation.navigate('ViewItem2');
+    }
+    const item3 = () => {
+        navigation.navigate('ViewItem3');
+    }
+    const aboutDeveloper = () => {
+        navigation.navigate('About');
+    }
+
+    const toggleBiometricEnabled = async () => {
+        if (biometricEnabled){
+            const isAuthenticated = await authenticateWithBiometrics2();
+            if (isAuthenticated) {
+                setBiometricEnabled(false);
+            }else {
+                return true;
+            }
+        }
+        const newBiometricEnabled = !biometricEnabled;
+        setBiometricEnabled(newBiometricEnabled);
+    
+        // Save the updated state to AsyncStorage along with the user's UID
+        try {
+          await AsyncStorage.setItem(`biometricEnabled:${userUID}`, newBiometricEnabled.toString());
+        } catch (error) {
+          console.error('Error saving biometric setting:', error);
+        }
+      };
+    
+      // Load the biometric setting for the current user when the component mounts
+      useEffect(() => {
+        const loadBiometricSetting = async () => {
+          try {
+            const savedSetting = await AsyncStorage.getItem(`biometricEnabled:${userUID}`);
+            if (savedSetting !== null) {
+              setBiometricEnabled(savedSetting === 'true');
+            }
+          } catch (error) {
+            console.error('Error loading biometric setting:', error);
+          }
+        };
+    
+        if (userUID) {
+          loadBiometricSetting();
+        }
+      }, [userUID]);
    
     const handleSelectedItem = async (item) => {
         if (biometricEnabled) {
@@ -56,7 +250,6 @@ const HomeScreen = () => {
         }
     };
     
-
     const authenticateWithBiometrics = async () => {
         try {
             const hasBiometrics = await LocalAuthentication.hasHardwareAsync();
@@ -82,8 +275,50 @@ const HomeScreen = () => {
         }
     };
 
+    const authenticateWithBiometrics2 = async () => {
+        try {
+            const hasBiometrics = await LocalAuthentication.hasHardwareAsync();
+            if (hasBiometrics) {
+                const isBiometricEnabled = await LocalAuthentication.isEnrolledAsync();
+                if (isBiometricEnabled) {
+                    const result = await LocalAuthentication.authenticateAsync({
+                        promptMessage: 'Authenticate to switch off the toggle',
+                    });
+                    if (result.success) {
+                        return true;
+                    } else {
+                        console.log('Biometric authentication failed');
+                    }
+                } else {
+                    console.log('Biometric is not enrolled');
+                }
+            } else {
+                console.log('Biometric hardware is not available');
+            }
+        } catch (error) {
+            console.error('Error during biometric authentication:', error);
+        }
+    };
+
       useEffect(() => {
+        setIsLoading(true);
         const user = auth.currentUser;
+
+        if (user) {
+            // Fetch user's first name from Firestore
+            const userDocRef = doc(FIREBASE_FIRESTORE, 'users', user.uid);
+            getDoc(userDocRef)
+                .then((userDoc) => {
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        setUserFirstName(userData.firstname);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error fetching user data:', error);
+                });
+        }
+
         const querySnapshot = collection(FIREBASE_FIRESTORE, 'accounts');
         const unsubscribe = onSnapshot(querySnapshot, (snapshot) => {
             const accountsData = [];
@@ -102,8 +337,9 @@ const HomeScreen = () => {
                             createdAt: data.createdAt,
                         });
 
+                    setIsLoading(false);
                     } catch (error) {
-                        console.error('Error decrypting password:', error);
+                        console.log('Error decrypting password:', error);
                     }
                 }
             });
@@ -121,10 +357,8 @@ const HomeScreen = () => {
             }
             setSortedAccounts(sortedData);
         });
-    
         return () => {
             unsubscribe();
-            setSelectedItem(null);
         }
     }, [searchInput, sortMode]);
 
@@ -142,7 +376,6 @@ const HomeScreen = () => {
       
 
     const renderItem = ({ item }) => (
-
         <View style={styles.itemList}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
             <Image
@@ -161,6 +394,10 @@ const HomeScreen = () => {
                         return PLATFORM_IMAGES.telegram.uri;
                     } else if (item.title === 'Instagram') {
                         return PLATFORM_IMAGES.instagram.uri;
+                    } else if (item.title === 'Moonton') {
+                        return PLATFORM_IMAGES.mobile.uri;
+                    } else if (item.title === 'Lazada') {
+                        return PLATFORM_IMAGES.lazada.uri;
                     }
                 })()}
                 style={styles.image}
@@ -180,10 +417,13 @@ const HomeScreen = () => {
             </View>
             <View style={{}}>
                 <TouchableOpacity onPress={() => handleSelectedItem(item)}>
-                    <FontAwesomeIcon icon={ faChevronCircleRight } size={20} style={[styles.icon, styles.firstIcon]}/>
+                    <View>
+                        <Ionicons name="chevron-forward-circle" size={30} color="#244499" style={{marginHorizontal: 10}}/>
+                    </View>
                 </TouchableOpacity>
             </View>
         </View>
+
     );
 
 
@@ -191,19 +431,12 @@ const HomeScreen = () => {
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.userInfo}>
-                    <Image
-                    source={require('../../images/security.jpg')}
-                    style={styles.image}
-                    resizeMode="contain"
-                    />
-                    <Text style={{fontSize: 15, color: 'white'}}>  Hi Wilfredo</Text>
+                    <ProfileImageUpload/>
+                    <Text style={{fontSize: 15, color: 'white'}}>  Hi {userFirstName}</Text>
                 </View>
                 <View style={styles.iconHeader}>
-                    <TouchableOpacity >
-                        <FontAwesomeIcon icon={ faQuestionCircle } size={20} style={[styles.icon, {color: 'white'}]}/>
-                    </TouchableOpacity>
                     <TouchableOpacity onPress={() => bottomSheetRef.current.open()}>
-                        <FontAwesomeIcon icon={ faCog } size={20} style={[styles.icon, {color: 'white'}]}/>
+                        <Ionicons name="settings-outline" size={25} color="white"/>
                     </TouchableOpacity>
                 </View>
                 
@@ -212,50 +445,68 @@ const HomeScreen = () => {
                 <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} style={styles.horizontalContainer}>
                     <View style={styles.item}>
                         <View style={{flexDirection: 'row'}}>
-                        <FontAwesomeIcon icon={ faLightbulb } size={15} style={{marginRight: 2, color: 'orange'}}/>
+                        <Ionicons name="bulb-outline" size={20} color="orange"/>
                         <Text style={{color: 'white'}}>Steps on how to create a strong password.</Text> 
                         </View>
-                        <TouchableOpacity style={styles.button}>
-                        <Text style={{color: 'white'}}>View</Text>
-                        </TouchableOpacity>
+                        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto'}}>
+                            <TouchableOpacity style={styles.button} onPress={item1}>
+                            <Text style={{color: 'white'}}>View</Text>
+                            </TouchableOpacity>
+                            <View style={{flexDirection:'row', alignItems:'center'}}>
+                            <Ionicons name="heart-outline" size={22} color="white"/> 
+                            <Text style={{color: 'white'}}> {likeCount2}</Text>
+                            </View>
+                        </View>
                     </View>
                     <View style={styles.item2}>
                         <View style={{flexDirection: 'row'}}>
-                        <FontAwesomeIcon icon={ faLightbulb } size={15} style={{marginRight: 2, color: 'orange'}}/>
+                        <Ionicons name="bulb-outline" size={20} color="orange"/>
                         <Text style={{color: 'white'}}>How to secure your account.</Text>
                         </View>
-                        <TouchableOpacity style={styles.button}>
-                        <Text style={{color: 'white'}}>View</Text>
-                        </TouchableOpacity>
+                        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto'}}>
+                            <TouchableOpacity style={styles.button} onPress={item2}>
+                            <Text style={{color: 'white'}}>View</Text>
+                            </TouchableOpacity>
+                            <View style={{flexDirection:'row', alignItems:'center'}}>
+                            <Ionicons name="heart-outline" size={22} color="white"/> 
+                            <Text style={{color: 'white'}}> {likeCount}</Text>
+                            </View>
+                        </View>
                     </View>
                     <View style={styles.item3}>
                         <View style={{flexDirection: 'row'}}>
-                        <FontAwesomeIcon icon={ faLightbulb } size={15} style={{marginRight: 2, color: 'orange'}}/>
+                        <Ionicons name="bulb-outline" size={20} color="orange"/>
                         <Text style={{color: 'white'}}>Most common reasons why account have been hacked.</Text>
                         </View>
-                        <TouchableOpacity style={styles.button}>
-                        <Text style={{color: 'white'}}>View</Text>
-                        </TouchableOpacity>
+                        <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto'}}>
+                            <TouchableOpacity style={styles.button} onPress={item3}>
+                            <Text style={{color: 'white'}}>View</Text>
+                            </TouchableOpacity>
+                            <View style={{flexDirection:'row', alignItems:'center'}}>
+                            <Ionicons name="heart-outline" size={22} color="white"/> 
+                            <Text style={{color: 'white'}}> {likeCount3}</Text>
+                            </View>
+                        </View>
                     </View>
                 </ScrollView>
                 <View style={styles.searchContainer}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', flex: 1, borderWidth: 2, borderColor: '#6495ED', marginHorizontal: 5, paddingVertical: 3, borderRadius: 30, elevation: 2 }}>
-                        <FontAwesomeIcon icon={faSearch} size={24} style={styles.search} />
+                    <Ionicons name="search-circle" size={40} color="#244499"/>
                     <TextInput placeholder="Search" value={searchInput} onChangeText={setSearchInput} style={styles.searchInput}/>
                     </View>
                 </View>
 
                 <View style={styles.crudContainer}>
-                        <TouchableOpacity onPress={handleItemAdd} style={{flexDirection: 'row', alignItems: 'center', borderRadius: 20, padding: 8, backgroundColor: '#244499'}}>
-                            <FontAwesomeIcon icon={faPlusCircle} size={19} style={{ color: 'white'}} />
+                        <TouchableOpacity onPress={handleItemAdd} style={{flexDirection: 'row', alignItems: 'center', borderRadius: 10, padding: 8, backgroundColor: '#244499'}}>
+                            <Ionicons name="add-circle-outline" size={22} color="white"/>
                             <Text style={{color: 'white', fontSize: 13.5}}> Add account</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={handleItemAdd} style={{flexDirection: 'row', alignItems: 'center', borderRadius: 20, padding: 8, backgroundColor: '#CB362E'}}>
-                            <FontAwesomeIcon icon={faKey} size={19} style={{ color: 'white'}} />
+                        <TouchableOpacity onPress={handleGenerate} style={{flexDirection: 'row', alignItems: 'center', borderRadius: 10, padding: 8, backgroundColor: '#CB362E'}}>
+                            <Ionicons name="key-outline" size={22} color="white"/>
                             <Text style={{color: 'white', fontSize: 13.5}}> Generate Password</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={handleItemAdd} style={{flexDirection: 'row', alignItems: 'center', borderRadius: 20, padding: 8, backgroundColor: '#018FF8'}}>
-                            <FontAwesomeIcon icon={faHistory} size={19} style={{ color: 'white'}} />
+                        <TouchableOpacity onPress={handleHistory} style={{flexDirection: 'row', alignItems: 'center', borderRadius: 10, padding: 8, backgroundColor: '#018FF8'}}>
+                            <Ionicons name="timer-outline" size={22} color="white"/>
                             <Text style={{color: 'white', fontSize: 13.5}}> View History</Text>
                         </TouchableOpacity>
                 </View>
@@ -265,16 +516,24 @@ const HomeScreen = () => {
                     <View style={{alignItems: 'flex-start', marginTop: 20, marginHorizontal: 5, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                         <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>Saved Password</Text>
                         <TouchableOpacity onPress={toggleSortMode}>
-                            <FontAwesomeIcon icon={faSortAmountDown} size={15} style={styles.sortIcon}/>
+                            <Ionicons name="funnel-outline" size={20} color="white"/>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.listContent}>
+                    {isLoading ? (
+                    // Display a loading indicator here
+                    //<ActivityIndicator size="small" color="#0000ff" />
+                    <LoadingOverlay/>
+                    ) : (
+                    <> 
                         <FlatList
                             data={sortedAccounts}
                             renderItem={renderItem}
                             keyExtractor={(item) => item.id}
                             showsVerticalScrollIndicator={false}
                         />
+                    </> 
+                    )}
                     </View>
                 </View>
 
@@ -287,10 +546,31 @@ const HomeScreen = () => {
                         wrapper: styles.bottomSheetWrapper,
                     }}>
                     <View style={styles.bottomSheetContent}>
-                        {/* Your bottom sheet content goes here */}
-                            <Switch value={biometricEnabled}
-                             onValueChange={(value) => setBiometricEnabled(value)}/>
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                             <Text>Enable Biometric Authentication</Text>
+                            <Switch value={biometricEnabled}
+                             onValueChange={toggleBiometricEnabled}/>
+                        </View>
+
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                            <Text>About the developer</Text>
+                            <TouchableOpacity onPress={aboutDeveloper}>
+                                <Ionicons name="person-circle-outline" size={30}/>
+                            </TouchableOpacity>
+                        </View>
+                        
+                        <TouchableOpacity style={{alignItems: 'flex-start', borderWidth: 1, alignItems: 'center', borderRadius: 20, marginHorizontal: 60, marginTop: 20}} onPress={handleLogout}>
+                            <View style={{flexDirection: 'row', padding: 10, alignItems: 'center'}}>
+                            {isLoading2 ? (
+                            <ActivityIndicator size="small" color="black" />
+                            ) : (
+                            <> 
+                            <Ionicons name="log-out-outline" size={20}/>
+                            <Text> Logout your account</Text>
+                            </>
+                            )}
+                            </View>
+                        </TouchableOpacity>
                     </View>
                 </BottomSheet>
         
@@ -343,8 +623,6 @@ const styles = StyleSheet.create({
         height: 100,
         padding: 15,
         backgroundColor: '#2196E0',
-        justifyContent: 'flex-start',
-        alignItems: 'flex-start',
         marginRight: 15,
         borderRadius: 20,
         shadowColor: 'black',
@@ -357,8 +635,6 @@ const styles = StyleSheet.create({
         height: 100,
         padding: 15,
         backgroundColor: '#CB362E',
-        justifyContent: 'flex-start',
-        alignItems: 'flex-start',
         marginRight: 15,
         borderRadius: 20,
         shadowColor: 'black',
@@ -371,8 +647,6 @@ const styles = StyleSheet.create({
         height: 100,
         padding: 15,
         backgroundColor: '#244499',
-        justifyContent: 'flex-start',
-        alignItems: 'flex-start',
         marginRight: 15,
         borderRadius: 20,
         shadowColor: 'black',
@@ -416,7 +690,7 @@ const styles = StyleSheet.create({
         color: 'white'
       },
       mainContent: {
-        marginTop: 10,
+        marginTop: 5,
         borderTopRightRadius: 30,
         borderTopLeftRadius: 30,
         backgroundColor: '#695BEE',
@@ -425,7 +699,6 @@ const styles = StyleSheet.create({
       },
       crudContainer: {
         marginHorizontal: 10,
-        marginTop: 5,
         alignSelf: 'stretch',
         justifyContent: 'space-between',
         flexDirection: 'row',
@@ -443,6 +716,10 @@ const styles = StyleSheet.create({
       itemList: {
         width: 350,
         height: 90,
+        borderLeftWidth: 5,
+        borderLeftColor: '#018FF8',
+        borderRightWidth: 2,
+        borderRightColor: '#018FF8',
         backgroundColor: 'white',
         marginBottom: 10,
         elevation: 5,
