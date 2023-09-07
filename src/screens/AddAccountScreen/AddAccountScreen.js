@@ -111,9 +111,9 @@ const AddAccountScreen = () => {
 
     const deleteItem = async (itemId) => {
         try {
-            // Delete from Firestore
+            
             await deleteDoc(doc(FIREBASE_FIRESTORE, 'accounts', itemId));
-            // Update state to remove the deleted item from the UI
+            
             //setSortedAccounts((prevAccounts) => prevAccounts.filter((account) => account.id !== itemId));
         } catch (error) {
             console.error('Error deleting item:', error);

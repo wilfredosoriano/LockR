@@ -12,7 +12,7 @@ const GeneratePassword = () => {
     const [generatedPassword, setGeneratedPassword] = useState('');
 
     const handleGeneratePassword = () => {
-        const newPassword = generateRandomPassword(12); // Change the length as needed
+        const newPassword = generateRandomPassword(12); 
         setGeneratedPassword(newPassword);
       };
 

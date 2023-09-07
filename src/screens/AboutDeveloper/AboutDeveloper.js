@@ -25,9 +25,9 @@ const AboutDeveloper = () => {
       };          
 
       const sendEmail = () => {
-        const email = 'wilfredosoriano.bsit.ucu@gmail.com'; // Replace with your email address
-        const subject = 'Feedback'; // Replace with your desired email subject
-        const body = 'Hello, I wanted to provide feedback on your app...'; // Replace with your desired email body
+        const email = 'wilfredosoriano.bsit.ucu@gmail.com'; 
+        const subject = 'Feedback'; 
+        const body = 'Hello, I wanted to provide feedback on your app...'; 
         const mailtoURL = `mailto:${email}?subject=${subject}&body=${body}`;
 
         Linking.openURL(mailtoURL)

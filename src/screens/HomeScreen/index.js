@@ -48,66 +48,65 @@ const HomeScreen = () => {
     const [likeCount3, setLikeCount3] = useState(0);
 
     useEffect(() => {
-        // Create a reference to the "likes" collection
+        
         const likesCollectionRef = collection(FIREBASE_FIRESTORE, 'likes');
 
-        // Create a query to get likes for "item2"
+        
         const likesQuery = query(
             likesCollectionRef,
-            where('itemId', '==', 'item2') // Replace with the actual item ID
+            where('itemId', '==', 'item2') 
         );
 
-        // Subscribe to real-time updates for the likes query
+        
         const unsubscribe = onSnapshot(likesQuery, (querySnapshot) => {
-            // Update the like count based on the number of documents in the snapshot
+            
             setLikeCount(querySnapshot.size);
         });
 
-        // Clean up the listener when the component unmounts
+        
         return () => {
             unsubscribe();
         };
     }, []);
 
     useEffect(() => {
-        // Create a reference to the "likes" collection
+       
         const likesCollectionRef = collection(FIREBASE_FIRESTORE, 'likes');
 
-        // Create a query to get likes for "item2"
         const likesQuery = query(
             likesCollectionRef,
-            where('itemId', '==', 'item1') // Replace with the actual item ID
+            where('itemId', '==', 'item1') 
         );
 
-        // Subscribe to real-time updates for the likes query
+       
         const unsubscribe = onSnapshot(likesQuery, (querySnapshot) => {
-            // Update the like count based on the number of documents in the snapshot
+            
             setLikeCount2(querySnapshot.size);
         });
 
-        // Clean up the listener when the component unmounts
+      
         return () => {
             unsubscribe();
         };
     }, []);
 
     useEffect(() => {
-        // Create a reference to the "likes" collection
+  
         const likesCollectionRef = collection(FIREBASE_FIRESTORE, 'likes');
 
-        // Create a query to get likes for "item2"
+ 
         const likesQuery = query(
             likesCollectionRef,
-            where('itemId', '==', 'item3') // Replace with the actual item ID
+            where('itemId', '==', 'item3') 
         );
 
-        // Subscribe to real-time updates for the likes query
+      
         const unsubscribe = onSnapshot(likesQuery, (querySnapshot) => {
-            // Update the like count based on the number of documents in the snapshot
+            
             setLikeCount3(querySnapshot.size);
         });
 
-        // Clean up the listener when the component unmounts
+        
         return () => {
             unsubscribe();
         };
@@ -118,30 +117,30 @@ const HomeScreen = () => {
 
     const handleBackPress = () => {
         if (shouldExitApp) {
-          // If the user presses the back button again within a certain time frame, exit the app
+          
           BackHandler.exitApp();
         } else {
-          // Show a toast message to inform the user to press again to exit
+          
           ToastAndroid.show('Press back again to exit', ToastAndroid.SHORT);
       
-          // Set shouldExitApp to true to enable the exit behavior on the next back press
+          
           setShouldExitApp(true);
       
-          // Reset shouldExitApp after a certain time frame (e.g., 2 seconds)
+          
           setTimeout(() => {
             setShouldExitApp(false);
-          }, 2000); // Adjust the duration as needed
+          }, 2000); 
         }
       
-        // Return true to prevent the default behavior (navigating back)
+        
         return true;
       };      
 
     useEffect(() => {
-    // Add the back button listener
+    
     const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
     
-    // Remove the listener when the component unmounts
+   
     return () => {
         backHandler.remove();
     };
@@ -213,7 +212,7 @@ const HomeScreen = () => {
         const newBiometricEnabled = !biometricEnabled;
         setBiometricEnabled(newBiometricEnabled);
     
-        // Save the updated state to AsyncStorage along with the user's UID
+        
         try {
           await AsyncStorage.setItem(`biometricEnabled:${userUID}`, newBiometricEnabled.toString());
         } catch (error) {
@@ -221,7 +220,7 @@ const HomeScreen = () => {
         }
       };
     
-      // Load the biometric setting for the current user when the component mounts
+      
       useEffect(() => {
         const loadBiometricSetting = async () => {
           try {
@@ -305,7 +304,7 @@ const HomeScreen = () => {
         const user = auth.currentUser;
 
         if (user) {
-            // Fetch user's first name from Firestore
+            
             const userDocRef = doc(FIREBASE_FIRESTORE, 'users', user.uid);
             getDoc(userDocRef)
                 .then((userDoc) => {
@@ -521,7 +520,7 @@ const HomeScreen = () => {
                     </View>
                     <View style={styles.listContent}>
                     {isLoading ? (
-                    // Display a loading indicator here
+                    
                     //<ActivityIndicator size="small" color="#0000ff" />
                     <LoadingOverlay/>
                     ) : (

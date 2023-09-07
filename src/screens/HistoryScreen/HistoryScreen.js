@@ -23,7 +23,7 @@ const HistoryScreen = () => {
         const user = auth.currentUser;
           const q = query(
             collection(FIREBASE_FIRESTORE, 'history'),
-            orderBy('timestamp', 'desc') // Order by timestamp in descending order
+            orderBy('timestamp', 'desc') 
           );
           const querySnapshot = await getDocs(q);
           const logs = [];
@@ -92,7 +92,7 @@ const HistoryScreen = () => {
                     >
                         <TouchableOpacity onPress={toggleModal} activeOpacity={11} style={styles.modalContainer}>
                             <View style={styles.modalContent}>
-                            {/* Add your modal content here */}
+                        
                             <View style={{alignItems: 'center', marginBottom: 5,}}>
                                 <Ionicons name="information-circle-outline" size={30} color="#DE922A"/>
                             </View>

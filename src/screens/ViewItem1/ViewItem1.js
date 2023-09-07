@@ -19,7 +19,7 @@ const ViewItem1 = () => {
     const [isHeartFilled, setIsHeartFilled] = useState(false);
     const [timeDifference, setTimeDifference] = useState(null);
 
-    // Calculate the time for 23 hours (in milliseconds)
+   
     const twentyThreeHours = 24 * 60 * 60 * 1000;
 
     const handleHeartClick = async () => {
@@ -30,7 +30,7 @@ const ViewItem1 = () => {
               const lastLikeDate = new Date(parseInt(lastLikeTimestamp));
               const currentDate = new Date();
       
-              // Calculate the time difference in milliseconds
+              
               const difference = currentDate - lastLikeDate;
               
               setTimeDifference(difference);
@@ -39,7 +39,7 @@ const ViewItem1 = () => {
                 const remainingTime = twentyThreeHours - difference;
                 const remainingHours = Math.floor(remainingTime / (60 * 60 * 1000));
                 ToastAndroid.show(`You already liked today. You can like again in ${remainingHours} hours.`, ToastAndroid.SHORT);
-                return; // Prevent further execution
+                return; 
               }
             }
           } else {
@@ -49,16 +49,13 @@ const ViewItem1 = () => {
                 await AsyncStorage.setItem(user.uid + 'item1', JSON.stringify(!isHeartFilled));
                 await AsyncStorage.setItem(user.uid + 'item1_last_like', String(new Date().getTime()));
     
-                // Check if the user has already liked this item
+                
     
                     await addDoc(collection(FIREBASE_FIRESTORE, 'likes'), {
-                        itemId: 'item1', // Replace with the actual item ID
+                        itemId: 'item1', 
                         userId: user.uid,
                     });
     
-                    // Update the local state to reflect that the user has liked the item
-    
-                    // Increment the like count
                     //setLikeCount(likeCount + 1);
                     console.log('like added:', user.uid);
     
@@ -69,8 +66,8 @@ const ViewItem1 = () => {
     }
 
     useEffect(() => {
-        // You can add code here to fetch the initial like count from the database
-        // and update the like count and heart icon accordingly.
+        
+        
 
         if (user){
             const fetchLikedStatus = async () => {
@@ -80,7 +77,7 @@ const ViewItem1 = () => {
                         setIsHeartFilled(JSON.parse(likedStatus));
                     }
                 } catch (error) {
-                    // Handle error
+                    console.log(error);
                 }
             };
     

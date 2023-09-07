@@ -19,8 +19,8 @@ const DeveloperProfile = () => {
       getDownloadURL(storageRef)
         .then((url) => setProfileImage(url))
         .catch((error) => {
-          // If the user doesn't have a profile image yet, set the default image here.
-          setProfileImage(require('../../images/security.png')); // Replace with your default image source
+          
+          setProfileImage(require('../../images/security.png')); 
         });
     }, [userUID]);
 
@@ -38,14 +38,14 @@ const DeveloperProfile = () => {
 
         if (!result.canceled) {
         setUploading(true);
-        // Upload the selected image to Firebase Storage
+        
         const response = await fetch(result.assets[0].uri);
         const blob = await response.blob();
         const storageRef = ref(FIREBASE_STORAGE, `profileImages/security.png`);
         
-        // Upload the image
+        
         try {
-            // Upload the image
+            
             await uploadBytes(storageRef, blob);
             ToastAndroid.show('Uploaded Successfully', ToastAndroid.SHORT);
         } catch (error) {
@@ -55,7 +55,7 @@ const DeveloperProfile = () => {
             setUploading(false);
         }
         
-        // Update the profile image URL in the state
+       
         setProfileImage(result.assets[0].uri);
         }
     }
