@@ -4,7 +4,7 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 const LoadingOverlay = () => {
   return (
     <View style={styles.overlay}>
-      <ActivityIndicator size="large" color="white" />
+      <ActivityIndicator size="large" color="black" />
     </View>
   );
 };

@@ -7,6 +7,7 @@ import { FIREBASE_STORAGE } from "../../../Firebaseconfig";
 import { getDownloadURL } from "firebase/storage";
 import LoadingOverlay from "../../components/LoadingOverlay";
 import { PLATFORM_IMAGES } from "../../utils/platformImages";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const ProfileImageUpload = () => {
     const auth = getAuth();
@@ -26,6 +27,21 @@ const ProfileImageUpload = () => {
         });
     }, [userUID]);
 
+    useEffect(() => {
+      const getStoredProfileImage = async () => {
+        try {
+          const storedImage = await AsyncStorage.getItem(`profileImage/${user}`);
+          if (storedImage) {
+            setProfileImage(storedImage);
+          }
+        } catch (error) {
+          console.error("Error retrieving stored profile image:", error);
+        }
+      };
+    
+      getStoredProfileImage();
+    }, []);
+
   const pickImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -43,18 +59,18 @@ const ProfileImageUpload = () => {
       const blob = await response.blob();
       const storageRef = ref(FIREBASE_STORAGE, `profileImages/${userUID}`);
       
-      
       try {
        
         await uploadBytes(storageRef, blob);
         ToastAndroid.show('Uploaded Successfully', ToastAndroid.SHORT);
+
+        await AsyncStorage.setItem(`profileImage/${user}`, result.assets[0].uri);
       } catch (error) {
         console.error("Error uploading image:", error);
         ToastAndroid.show('Upload Failed', ToastAndroid.SHORT);
       } finally {
         setUploading(false);
       }
-      
       
       setProfileImage(result.assets[0].uri);
     }
@@ -69,7 +85,7 @@ const ProfileImageUpload = () => {
         ) : (
           <Image
             source={profileImage ? { uri: profileImage } : PLATFORM_IMAGES.security.uri}
-            style={{ width: 50, height: 50, borderRadius: 50, borderWidth: 2, borderColor: 'white' }}
+            style={{ width: 50, height: 50, borderRadius: 50, borderWidth: 2, borderColor: 'black' }}
           />
         )}
       </TouchableOpacity>

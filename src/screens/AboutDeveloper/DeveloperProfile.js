@@ -5,6 +5,7 @@ import { uploadBytes, ref } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 import { FIREBASE_STORAGE } from "../../../Firebaseconfig";
 import { getDownloadURL } from "firebase/storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const DeveloperProfile = () => {
     const auth = getAuth();
@@ -23,6 +24,21 @@ const DeveloperProfile = () => {
           setProfileImage(require('../../images/security.png')); 
         });
     }, [userUID]);
+
+    useEffect(() => {
+      const getStoredProfileImage = async () => {
+        try {
+          const storedImage = await AsyncStorage.getItem("developerImage");
+          if (storedImage) {
+            setProfileImage(storedImage);
+          }
+        } catch (error) {
+          console.error("Error retrieving stored profile image:", error);
+        }
+      };
+    
+      getStoredProfileImage();
+    }, []);
 
   const pickImage = async () => {
 
@@ -48,6 +64,8 @@ const DeveloperProfile = () => {
             
             await uploadBytes(storageRef, blob);
             ToastAndroid.show('Uploaded Successfully', ToastAndroid.SHORT);
+
+            await AsyncStorage.setItem("developerImage", result.assets[0].uri);
         } catch (error) {
             console.error("Error uploading image:", error);
             ToastAndroid.show('Upload Failed', ToastAndroid.SHORT);

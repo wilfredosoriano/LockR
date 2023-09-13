@@ -61,21 +61,21 @@ const GeneratePassword = () => {
                 value={generatedPassword}
                 onChangeText={(text) => setGeneratedPassword(text)}
                 placeholder="Generated Password"
-                style={{ fontSize: 25 }}
+                style={{ fontSize: 24, fontFamily: 'Open-Sans', flex: 1 }}
             />  
             <TouchableOpacity onPress={handleCopyPassword}>
                 <Ionicons name="copy-outline" size={30}/>
             </TouchableOpacity>
             </View>
-            <TouchableOpacity onPress={handleGeneratePassword} style={{alignItems: 'center', backgroundColor: '#018FF8', marginHorizontal: 20, paddingVertical: 15, borderRadius: 30, flexDirection: 'row', justifyContent: 'center'}}>
+            <TouchableOpacity onPress={handleGeneratePassword} style={{alignItems: 'center', backgroundColor: '#FAAC33', marginHorizontal: 20, paddingVertical: 15, borderRadius: 30, flexDirection: 'row', justifyContent: 'center'}}>
                 <Ionicons name="key-outline" color="white" size={20}/>
-                <Text style={{color: 'white'}}> GENERATE</Text>
+                <Text style={{color: 'white', fontFamily: 'Open-Sans'}}> GENERATE</Text>
             </TouchableOpacity>
             <View style={{marginHorizontal: 20, marginTop: 20,}}>
-                <Text style={{fontWeight: 'bold', fontSize: 18}}>About this feature</Text>
+                <Text style={{fontFamily: 'Open-Sans-Bold', fontSize: 18}}>About this feature</Text>
             </View>
             <View style={[styles.boxContent, {backgroundColor: '#CEEEB4', marginTop: 10}]}>
-                <Text style={{textAlign: 'center'}}><Ionicons name="alert-outline" color="orange" size={15}/>This feature helps you generate a unique password that is hard to guess by anyone. It ensures that your passwords are difficult to predict. 
+                <Text style={{textAlign: 'center', fontFamily: 'Open-Sans'}}><Ionicons name="alert-outline" color="orange" size={15}/>This feature helps you generate a unique password that is hard to guess by anyone. It ensures that your passwords are difficult to predict. 
                     You can generate a password and click <Ionicons name="copy-outline" size={16}/> to use it for your accounts. Don't worry because once you've generated it, 
                     you can save it in the app for safekeeping and easy access.</Text>
                 
@@ -88,7 +88,7 @@ const GeneratePassword = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#09055D',
+        backgroundColor: 'white',
     },
     header: {
         backgroundColor: 'white',
@@ -97,7 +97,8 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         flexDirection: 'row',
         alignItems: 'center',
-        elevation: 2,
+        marginTop:  5,
+        elevation: 5,
         justifyContent: 'space-between'
     },
     headerLeft: {
@@ -107,12 +108,12 @@ const styles = StyleSheet.create({
     passwordDetail: {
         fontSize: 20,
         marginHorizontal: 10,
-        fontWeight: 'bold'
+        fontFamily: 'Open-Sans-Bold'
     },
     mainContent: {
         backgroundColor: 'white',
         flex: 1,
-        elevation: 2,
+        elevation: 5,
         marginTop: 10,
         marginBottom: 20,
         marginHorizontal: 20,

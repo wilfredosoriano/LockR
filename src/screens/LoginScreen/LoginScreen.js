@@ -1,5 +1,5 @@
 import React, { useEffect, useState} from "react";
-import { View, Text, Image, StyleSheet, ToastAndroid, ActivityIndicator, TouchableOpacity, TextInput} from 'react-native';
+import { View, Text, StyleSheet, ToastAndroid, ActivityIndicator, TouchableOpacity, TextInput} from 'react-native';
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
@@ -13,10 +13,9 @@ import { Ionicons } from "@expo/vector-icons";
 const LoginScreen = () => {
 
     const navigation = useNavigation();
-    const { control, handleSubmit} = useForm();
     const [isLoading, setIsLoading] = useState(false);
-    const [rememberMe, setRememberMe] = useState(false); // State for Remember Me checkbox
-    const [email, setEmail] = useState(""); // State to store the email
+    const [rememberMe, setRememberMe] = useState(false);
+    const [email, setEmail] = useState(""); 
     const [password, setPassword] = useState(""); 
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
@@ -24,25 +23,6 @@ const LoginScreen = () => {
     const toggleCheckbox = () => {
       setRememberMe((prev) => !prev);
     };
-
-    /*const checkForExistingSession = async () => {
-      try {
-        const userData = await AsyncStorage.getItem('user');
-        if (userData) {
-          // User data found, navigate to the home screen
-          //ToastAndroid.show('User found', ToastAndroid.SHORT);
-          navigation.navigate('Home');
-        } else{
-          ToastAndroid.show('User data not found. Please log in.', ToastAndroid.SHORT);
-        }
-      } catch (error) {
-        console.log('Error checking existing session:', error);
-      }
-    };
-  
-    useEffect(() => {
-      checkForExistingSession();
-    }, []);*/
 
     useEffect(() => {
       const loadStoredCredentials = async () => {
@@ -71,14 +51,14 @@ const LoginScreen = () => {
         setEmailError("Email is required*");
         isValid = false;
       } else {
-        setEmailError(""); // Clear the error message
+        setEmailError("");
       }
   
       if (!password) {
         setPasswordError("Password is required*");
         isValid = false;
       } else {
-        setPasswordError(""); // Clear the error message
+        setPasswordError("");
       }
   
       return isValid;
@@ -93,7 +73,6 @@ const LoginScreen = () => {
         try {
 
           const auth = getAuth(app);
-          //const { email, password } = data;
           const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
           const user = userCredential.user;
@@ -102,20 +81,18 @@ const LoginScreen = () => {
             await AsyncStorage.setItem("email", email);
             await AsyncStorage.setItem("password", password);
           } else {
-            // If Remember Me is not checked, clear the stored credentials
+            
             await AsyncStorage.removeItem("email");
             await AsyncStorage.removeItem("password");
           }
 
-          // Save user data to AsyncStorage
-          //await AsyncStorage.setItem('user', JSON.stringify(user));
-          setIsLoading(false);
           navigation.navigate('Home');
           ToastAndroid.show('Login Successful', ToastAndroid.SHORT);
 
         } catch (error) {
           console.error('Login Error:', error.message);
           ToastAndroid.show('User not found. Please enter the correct email and password.', ToastAndroid.SHORT);
+        } finally {
           setIsLoading(false);
         }
     }
@@ -164,27 +141,14 @@ const LoginScreen = () => {
         <Text style={styles.errorText}>{passwordError}</Text>
       ) : null}
 
-          {/*<CustomInput name="email" placeholder="Email" control={control} rules={{required: 'Email is required*'}} 
-          style={styles.input} value={email}/>*/}
-
-          {/*<CustomInput
-          name="password" 
-          placeholder="Password" 
-          secureTextEntry 
-          control={control} 
-          rules={{required: 'Password is required*', 
-          minLength: {
-            value: 8, 
-          message: 'Password should be at least 8 charaters long.'}}} style={styles.input} value={password} /> */}
-
             <View style={{flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
               <TouchableOpacity onPress={toggleCheckbox} style={{ flexDirection: 'row', marginTop: 5, alignItems: 'center', marginLeft: 20}}>
               <Ionicons
                   name={rememberMe ? 'checkbox-outline' : 'square-outline'}
                   size={24}
-                  color={rememberMe ? 'white' : 'white'}
+                  color={rememberMe ? 'black' : 'black'}
                 />
-                <Text style={{color: 'white'}}> Remember Me</Text>
+                <Text style={[styles.text, {color: 'black', }]}> Remember Me</Text>
             </TouchableOpacity>
             
             <View style={{marginRight: 20}}>
@@ -192,7 +156,7 @@ const LoginScreen = () => {
             </View>
             </View>
           {isLoading ? (
-            <ActivityIndicator size="small" color="white" style={{marginTop: 20}}/>
+            <ActivityIndicator size="small" color="#FAAC33" style={{marginTop: 20}}/>
             ) : (
           <> 
           <CustomButton text="Login" onPress={LoginButton}/>
@@ -208,11 +172,11 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#09055D',
+      backgroundColor: 'white',
       justifyContent: 'center'
     },
     image: {
-        marginBottom: 20,
+      marginBottom: 20,
       width: 200, 
       height: 200,
       borderRadius: 50,
@@ -221,7 +185,8 @@ const styles = StyleSheet.create({
       marginTop: 20,
         fontSize: 30,
         marginBottom: 20,
-        color: 'white'
+        color: '#FAAC33',
+        fontFamily: 'Open-Sans-Bold',
     },
     textContainer: {
         flexDirection: "row",
@@ -233,13 +198,15 @@ const styles = StyleSheet.create({
     forgotText: {
         marginTop: 10,
         textAlign: 'right',
-        color: 'white'
+        color: 'black',
+        fontFamily: 'Open-Sans',
     },
     loginContainer: {
-      backgroundColor: '#695BEE',
+      backgroundColor: 'white',
       alignItems: 'center',
       borderRadius: 30,
       marginHorizontal: 20,
+      elevation: 2,
     },
     input: {
         width: '90%',
@@ -250,13 +217,21 @@ const styles = StyleSheet.create({
         borderColor: '#19162fff',
         backgroundColor: 'white',
         borderWidth: 1,
+        fontFamily: 'Open-Sans',
     },
     errorText: {
       alignSelf: 'stretch',
       color: 'orange',
       fontSize: 12,
       marginLeft: 20,
+      fontFamily: 'Open-Sans'
     },
+    text: {
+      fontFamily: 'Open-Sans',
+    },
+    textBold: {
+      fontFamily: 'Open-Sans-Bold',
+    }
   });
 
 

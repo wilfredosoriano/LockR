@@ -69,17 +69,18 @@ const HistoryScreen = () => {
                     <TouchableOpacity onPress={toggleModal}>
                         <Ionicons name="information-circle-outline" size={24} color="#DE922A"/>
                     </TouchableOpacity>
-                    <Text>About</Text>
+                    <Text style={{ fontFamily:'Open-Sans' }}>About</Text>
                     </View>
 
                 </View>
                 <FlatList
                     data={historyLogs}
+                    showsVerticalScrollIndicator={false}
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => (
                     <View style={styles.logItem}>
-                        <Text style={{fontWeight: 'bold'}}>{item.action}</Text>
-                        <Text>{item.timestamp.toDate().toLocaleString()}</Text>
+                        <Text style={{fontFamily: 'Open-Sans-Bold'}}>{item.action}</Text>
+                        <Text style={{fontFamily: 'Open-Sans'}}>{item.timestamp.toDate().toLocaleString()}</Text>
                     </View>
                     )}
                 />
@@ -97,7 +98,7 @@ const HistoryScreen = () => {
                                 <Ionicons name="information-circle-outline" size={30} color="#DE922A"/>
                             </View>
                             <View style={{marginBottom: 10}}>
-                            <Text style={{textAlign: 'center'}}>This section functions as a private activity log, capturing your actions within the app for your reference. 
+                            <Text style={{textAlign: 'center', fontFamily: 'Open-Sans' }}>This section functions as a private activity log, capturing your actions within the app for your reference. 
                             It ensures that you have visibility into your recent interactions and activities, allowing you to keep track of your actions and confirming your activity history. </Text>
                             </View>
                             </View>
@@ -114,7 +115,7 @@ const HistoryScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#09055D',
+        backgroundColor: 'white',
     },
     header: {
         backgroundColor: 'white',
@@ -123,7 +124,8 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         flexDirection: 'row',
         alignItems: 'center',
-        elevation: 2,
+        marginTop: 5,
+        elevation: 5,
         justifyContent: 'space-between'
     },
     headerLeft: {
@@ -133,12 +135,12 @@ const styles = StyleSheet.create({
     passwordDetail: {
         fontSize: 20,
         marginHorizontal: 10,
-        fontWeight: 'bold'
+        fontFamily: 'Open-Sans-Bold'
     },
     mainContent: {
         backgroundColor: 'white',
         flex: 1,
-        elevation: 2,
+        elevation: 5,
         marginTop: 10,
         marginBottom: 20,
         marginHorizontal: 20,
@@ -152,23 +154,24 @@ const styles = StyleSheet.create({
         borderLeftWidth: 7,
         borderRightWidth: 2,
         marginVertical: 2,
+        marginHorizontal: 5,
        elevation: 2,
        borderLeftColor: '#CB362E',
        borderRightColor: '#CB362E',
-       backgroundColor: 'white'
+       backgroundColor: 'white',
       },
       modalContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
       },
       modalContent: {
         alignItems: 'center',
         backgroundColor: 'white',
-        borderRadius: 20,
+        borderRadius: 5,
         padding: 20,
-        width: '80%', // Adjust the width as needed
+        width: '80%',
         elevation: 5,
       },
       

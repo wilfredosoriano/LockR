@@ -50,39 +50,48 @@ const AboutDeveloper = () => {
                 <DeveloperProfile/>
             </View>
                 <View style={styles.content}>
-                    <Text style={{textAlign: 'justify'}}>
-                        Hello, I'm<Text style={{fontWeight: 'bold'}}> Wilfredo Soriano Jr</Text>, an aspiring React Native developer. 
-                        This is my first app developed using the React Native framework. 
+                    <Text style={{textAlign: 'justify', fontFamily: 'Open-Sans'}}>
+                        Hello, I'm<Text style={{fontFamily: 'Open-Sans-Bold',}}> Wilfredo Soriano Jr</Text>, an aspiring React Native developer. 
+                        This is my first app called <Text style={{fontFamily: 'Open-Sans-Bold',}}>LockR</Text> developed using the React Native framework. 
                         It's a password manager that helps you securely store your passwords. 
                         You can save different accounts from your favorite social media platforms, making it easy to access and view your password details. 
                         It also features biometric authentication to enhance the security of your password details. 
                         Your password is encrypted, and only you can see it.
                     </Text>
-                    <Text style={{textAlign: 'justify'}}>
+                    <Text style={{textAlign: 'justify', fontFamily: 'Open-Sans'}}>
                         I'm developing apps that aim to simplify tasks for people. 
                         I hope you can support me by providing feedback about your experience with this app. 
-                        Please feel free to send me a message by clicking this "link." Whether your feedback is positive or negative, 
+                        Please feel free to send me a message by clicking the accounts below. Whether your feedback is positive or negative, 
                         I welcome it so that I can improve my skills.
                     </Text>
                 </View>
                     <View style={styles.socialContainer}>
-                        <Text style={{fontWeight: 'bold', fontSize: 16, marginBottom: 20,}}>Follow and message me here: </Text>
-                        <TouchableOpacity onPress={() => openLink('https://www.facebook.com/soriano.wilfredojr')} style={{flexDirection: 'row', alignItems: 'center'}}>
+                        <Text style={{fontFamily: 'Open-Sans-Bold', fontSize: 16, marginBottom: 20,}}>Follow and message me here: </Text>
+
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between',}}>
+                        <TouchableOpacity onPress={() => openLink('https://www.facebook.com/soriano.wilfredojr')} style={{flexDirection: 'row', alignItems: 'center', marginTop: 10, elevation: 5, backgroundColor: 'white', width: 100, padding: 5, marginHorizontal: 10,}}>
                         <Ionicons name="logo-facebook" size={30}/>
-                        <Text> facebook</Text>
+                        <Text style={styles.text}> Facebook</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => openLink('https://www.instagram.com/wilfredosorianojr')} style={{flexDirection: 'row', alignItems: 'center', marginTop: 5,}}>
+
+                        <TouchableOpacity onPress={() => openLink('https://www.instagram.com/wilfredosorianojr')} style={{flexDirection: 'row', alignItems: 'center', marginTop: 10, elevation: 5, backgroundColor: 'white', width: 100, padding: 5, marginHorizontal: 10,}}>
                         <Ionicons name="logo-instagram" size={30}/>
-                        <Text> instagram</Text>
+                        <Text style={styles.text}> Instagram</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => openLink('https://www.youtube.com/c/wilfredojr.7626')} style={{flexDirection: 'row', alignItems: 'center' , marginTop: 5, }}>
+                        </View>
+
+                        <View style={{flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 40,}}>
+                        <TouchableOpacity onPress={() => openLink('https://www.youtube.com/c/wilfredojr.7626')} style={{flexDirection: 'row', alignItems: 'center' , marginTop: 10, elevation: 5, backgroundColor: 'white', width: 100, padding: 5, marginHorizontal: 10,}}>
                         <Ionicons name="logo-youtube" size={30}/>
-                        <Text> youtube</Text>
+                        <Text style={styles.text}> Youtube</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={sendEmail} style={{flexDirection: 'row', alignItems: 'center' , marginTop: 5,}}>
+
+                        <TouchableOpacity onPress={sendEmail} style={{flexDirection: 'row', alignItems: 'center' , marginTop: 10, elevation: 5, backgroundColor: 'white', width: 100, padding: 5, marginHorizontal: 10,}}>
                         <Ionicons name="mail" size={30}/>
-                        <Text> wilfredosoriano.bsit.ucu@gmail.com</Text>
+                        <Text style={styles.text}> Gmail</Text>
                         </TouchableOpacity>
+                        </View>
+
                     </View>
             </View>
 
@@ -93,16 +102,17 @@ const AboutDeveloper = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#09055D',
+        backgroundColor: 'white'
     },
     header: {
         backgroundColor: 'white',
         marginHorizontal: 20,
+        marginTop: 5,
         padding: 10,
         borderRadius: 20,
         flexDirection: 'row',
         alignItems: 'center',
-        elevation: 2,
+        elevation: 5,
         justifyContent: 'space-between'
     },
     headerLeft: {
@@ -112,7 +122,7 @@ const styles = StyleSheet.create({
     passwordDetail: {
         fontSize: 20,
         marginHorizontal: 10,
-        fontWeight: 'bold'
+        fontFamily: 'Open-Sans-Bold'
     },
     image: {
     width: 50,
@@ -122,6 +132,7 @@ const styles = StyleSheet.create({
     },
     mainContent: {
         backgroundColor: 'white',
+        elevation: 5,
         flex: 1,
         marginTop: 10,
         marginBottom: 20,
@@ -139,6 +150,10 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
         marginVertical: 20,
         padding: 20,
+        alignItems: 'center'
+    },
+    text: {
+        fontFamily: 'Open-Sans',
     }
 });
 

@@ -20,15 +20,10 @@ const ViewAccountScreen = () => {
     const selectedItem = route.params?.selectedItem;
     
     const [dropdownVisible, setDropdownVisible] = useState(false);
-    const [modalVisible, setModalVisible] = useState(false);
-    const [editUsername, setEditUsername] = useState('');
-    const [editPassword, setEditPassword] = useState('');
 
     const [showPasswords, setShowPasswords] = useState({});
     
     const [passwordStrength, setPasswordStrength] = useState('');
-
-    const [selectedEditItem, setSelectedEditItem] = useState(null);
 
     useEffect(() => {
         evaluatePasswordStrength(selectedItem.password);
@@ -162,10 +157,6 @@ const ViewAccountScreen = () => {
                     onRequestClose={toggleDropdown}>
                     <TouchableOpacity style={styles.modalContainer} activeOpacity={11} onPress={handleTouchablePress}>
                         <View style={styles.dropdownContainer}>
-                            {/*<TouchableOpacity style={styles.dropdownItem} onPress={() => {setDropdownVisible(false); handleItemEdit(selectedItem)}}>
-                                <FontAwesomeIcon icon={faEdit} size={18} style={styles.dropdownIcon} />
-                                <Text style={styles.dropdownText}>Edit Account</Text>
-                            </TouchableOpacity>*/}
                             <TouchableOpacity style={styles.dropdownItem} onPress={() => {setDropdownVisible(false); deleteItem(selectedItem.id);}}>
                                 <Ionicons name="trash-outline" size={24}/>
                                 <Text style={styles.dropdownText}>Delete Account</Text>
@@ -197,22 +188,22 @@ const ViewAccountScreen = () => {
                 style={styles.image}
                 resizeMode="contain"
                 />
-                    <Text style={{fontSize: 20, fontWeight: 'bold', marginTop: 10,}}>{selectedItem.title}</Text>
+                    <Text style={{fontSize: 20, fontFamily: 'Open-Sans-Bold', marginTop: 10,}}>{selectedItem.title}</Text>
                 </View>
 
                 <View style={styles.boxContent}>
-                <Text style={{color: 'gray'}}>Username/email address</Text>
+                <Text style={{color: 'gray', fontFamily: 'Open-Sans'}}>Username/email address</Text>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                <Text style={{fontSize: 18, maxWidth: 220}}>{selectedItem.username}</Text>
+                <Text style={{fontSize: 18, maxWidth: 220, fontFamily: 'Open-Sans'}}>{selectedItem.username}</Text>
                 <TouchableOpacity onPress={handleCopyPassword2}>
                     <Ionicons name="copy-outline" size={20}/>
                 </TouchableOpacity>
                 </View>
 
-                <Text style={{color: 'gray', marginTop: 10}}>Password</Text>
+                <Text style={{color: 'gray', marginTop: 10, fontFamily: 'Open-Sans'}}>Password</Text>
                 <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                         {showPasswords[selectedItem.id] ? (
-                        <Text style={{fontSize: 18, maxWidth: 220}}>{selectedItem.password}</Text>
+                        <Text style={{fontSize: 18, maxWidth: 220, fontFamily: 'Open-Sans'}}>{selectedItem.password}</Text>
                         ) : (
                             <TextInput editable={false} style={[styles.asterisks, {maxWidth: 200}]}>{'*'.repeat(selectedItem.password.length)}</TextInput>
                         )}
@@ -230,15 +221,15 @@ const ViewAccountScreen = () => {
                         </View>
                 </View>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={{color: 'gray'}}>Password Strength: </Text>
+                <Text style={{color: 'gray', fontFamily: 'Open-Sans'}}>Password Strength: </Text>
                 {passwordStrength === 'Weak' && (
-                    <Text style={[styles.passwordStrengthWeak, styles.passwordStrengthIcon]}>Weak ✘</Text>
+                    <Text style={[styles.passwordStrengthWeak, styles.passwordStrengthIcon, {fontFamily: 'Open-Sans'}]}>Weak ✘</Text>
                 )}
                 {passwordStrength === 'Moderate' && (
-                    <Text style={[styles.passwordStrengthModerate, styles.passwordStrengthIcon]}> Moderate ⚠</Text>
+                    <Text style={[styles.passwordStrengthModerate, styles.passwordStrengthIcon, {fontFamily: 'Open-Sans'}]}> Moderate ⚠</Text>
                 )}
                 {passwordStrength === 'Strong' && (
-                    <Text style={[styles.passwordStrengthStrong, styles.passwordStrengthIcon]}> Strong ✔</Text>
+                    <Text style={[styles.passwordStrengthStrong, styles.passwordStrengthIcon, {fontFamily: 'Open-Sans'}]}> Strong ✔</Text>
                 )}
                 </View>
             </View>
@@ -251,7 +242,7 @@ const ViewAccountScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#09055D',
+        backgroundColor: 'white',
     },
     header: {
         backgroundColor: 'white',
@@ -260,7 +251,8 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         flexDirection: 'row',
         alignItems: 'center',
-        elevation: 2,
+        elevation: 5,
+        marginTop: 5,
         justifyContent: 'space-between'
     },
     headerLeft: {
@@ -270,7 +262,7 @@ const styles = StyleSheet.create({
     passwordDetail: {
         fontSize: 20,
         marginHorizontal: 10,
-        fontWeight: 'bold'
+        fontFamily: 'Open-Sans-Bold'
     },
     image: {
     width: 50,
@@ -281,7 +273,7 @@ const styles = StyleSheet.create({
     mainContent: {
         backgroundColor: 'white',
         flex: 1,
-        elevation: 2,
+        elevation: 5,
         marginTop: 10,
         marginBottom: 20,
         marginHorizontal: 20,

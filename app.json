@@ -1,14 +1,19 @@
 {
   "expo": {
     "scheme": "acme",
-    "icon": "./assets/images/Lockr.png",
+    "icon": "./assets/images/LockR_icon.png",
+    "splash": {
+      "image": "./assets/images/lockr_splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "web": {
       "bundler": "metro"
     },
     "plugins": [
       "expo-router"
     ],
-    "name": "Lockr",
+    "name": "LockR",
     "slug": "myFirstApp",
     "extra": {
       "router": {

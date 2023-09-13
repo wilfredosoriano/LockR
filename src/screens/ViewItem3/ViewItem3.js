@@ -17,50 +17,29 @@ const ViewItem3 = () => {
         navigation.navigate('Home');
     }
     const [isHeartFilled, setIsHeartFilled] = useState(false);
-    const [timeDifference, setTimeDifference] = useState(null);
-
-
-    const twentyThreeHours = 24 * 60 * 60 * 1000;
 
     const handleHeartClick = async () => {
 
-        if (isHeartFilled) {
-            const lastLikeTimestamp = await AsyncStorage.getItem(user.uid + 'item3_last_like');
-            if (lastLikeTimestamp !== null) {
-              const lastLikeDate = new Date(parseInt(lastLikeTimestamp));
-              const currentDate = new Date();
-      
-            
-              const difference = currentDate - lastLikeDate;
-              
-              setTimeDifference(difference);
-      
-              if (difference < twentyThreeHours) {
-                const remainingTime = twentyThreeHours - difference;
-                const remainingHours = Math.floor(remainingTime / (60 * 60 * 1000));
-                ToastAndroid.show(`You already liked today. You can like again in ${remainingHours} hours.`, ToastAndroid.SHORT);
-                return; 
-              }
-            }
-        } else {
+        if (isHeartFilled){
+            ToastAndroid.show('You already liked this. Thank you.', ToastAndroid.SHORT);
+        }
+
+        if (!isHeartFilled) {
             setIsHeartFilled(true);
 
             try {   
-                await AsyncStorage.setItem(user.uid + 'item3', JSON.stringify(!isHeartFilled));
-                    await AsyncStorage.setItem(user.uid + 'item3_last_like', String(new Date().getTime()));
-                    
+                    AsyncStorage.setItem(user.uid + 'item3', 'true');
                     await addDoc(collection(FIREBASE_FIRESTORE, 'likes'), {
                         itemId: 'item3', 
                         userId: user.uid,
                     });
     
-
-                    //setLikeCount(likeCount + 1);
                     console.log('like added:', user.uid);
+    
             } catch (error) {
                 console.error("Error handling heart click:", error);
             }
-        }
+          }
     }
 
     useEffect(() => {
@@ -94,45 +73,45 @@ const ViewItem3 = () => {
                 </View>
                 <TouchableOpacity onPress={handleHeartClick}>
                 <Ionicons
-                    name={isHeartFilled && timeDifference < twentyThreeHours ? "heart" : "heart-outline"}
+                    name={isHeartFilled ? "heart" : "heart-outline"}
                     size={30}
-                    color={isHeartFilled && timeDifference < twentyThreeHours ? "red" : "black"}
+                    color={isHeartFilled ? "red" : "black"}
                     />
                 </TouchableOpacity>
             </View>
 
             <View style={styles.mainContent}>
-            <Text style={{marginHorizontal: 5, fontWeight: 'bold', marginVertical: 10, fontSize: 15,}}>Most common reasons why account have been hacked: <Text onPress={() => { Linking.openURL('https://www.nbcnews.com/storyline/hacking-in-america/surprising-reason-why-you-keep-getting-hacked-n689081'); }} style={{fontWeight: '300', textDecorationLine: "underline"}}>Learn more</Text> </Text>
+            <Text style={{marginHorizontal: 5, fontFamily: 'Open-Sans-Bold', marginVertical: 10, fontSize: 15,}}>Most common reasons why account have been hacked: <Text onPress={() => { Linking.openURL('https://www.nbcnews.com/storyline/hacking-in-america/surprising-reason-why-you-keep-getting-hacked-n689081'); }} style={{fontWeight: '300', textDecorationLine: "underline"}}>Learn more</Text> </Text>
             <ScrollView showsVerticalScrollIndicator={false}>
             <View style={[styles.boxContent, {borderLeftWidth: 5, borderRightWidth: 2, marginTop: 5}]}>
-                <Text style={{textAlign: 'center'}}><Text style={{fontWeight: 'bold'}}>1. Weak Passwords:</Text> Using simple, easily guessable passwords, or reusing the same password across multiple accounts.</Text>
+                <Text style={{textAlign: 'center', fontFamily: 'Open-Sans'}}><Text style={{fontFamily: 'Open-Sans-Bold'}}>1. Weak Passwords:</Text> Using simple, easily guessable passwords, or reusing the same password across multiple accounts.</Text>
             </View>
             <View style={[styles.boxContent, {borderLeftWidth: 5, borderRightWidth: 2, marginTop: 5}]}>
-                <Text style={{textAlign: 'center'}}><Text style={{fontWeight: 'bold'}}>2. Phishing Attacks:</Text> Falling victim to phishing emails or websites that trick users into revealing their login credentials.</Text>
+                <Text style={{textAlign: 'center', fontFamily: 'Open-Sans'}}><Text style={{fontFamily: 'Open-Sans-Bold'}}>2. Phishing Attacks:</Text> Falling victim to phishing emails or websites that trick users into revealing their login credentials.</Text>
             </View>
             <View style={[styles.boxContent, {borderLeftWidth: 5, borderRightWidth: 2, marginTop: 5}]}>
-                <Text style={{textAlign: 'center'}}><Text style={{fontWeight: 'bold'}}>3. No Two-Factor Authentication (2FA):</Text> Not enabling 2FA, leaving accounts vulnerable to unauthorized access.</Text>
+                <Text style={{textAlign: 'center', fontFamily: 'Open-Sans'}}><Text style={{fontFamily: 'Open-Sans-Bold'}}>3. No Two-Factor Authentication (2FA):</Text> Not enabling 2FA, leaving accounts vulnerable to unauthorized access.</Text>
             </View>
             <View style={[styles.boxContent, {borderLeftWidth: 5, borderRightWidth: 2, marginTop: 5}]}>
-                <Text style={{textAlign: 'center'}}><Text style={{fontWeight: 'bold'}}>4. Outdated Software:</Text> Failing to update operating systems, applications, and plugins, which can contain security vulnerabilities.</Text>
+                <Text style={{textAlign: 'center', fontFamily: 'Open-Sans'}}><Text style={{fontFamily: 'Open-Sans-Bold'}}>4. Outdated Software:</Text> Failing to update operating systems, applications, and plugins, which can contain security vulnerabilities.</Text>
             </View>
             <View style={[styles.boxContent, {borderLeftWidth: 5, borderRightWidth: 2, marginTop: 5}]}>
-                <Text style={{textAlign: 'center'}}><Text style={{fontWeight: 'bold'}}>5. Public Wi-Fi Risks:</Text> Using unsecured public Wi-Fi networks, making it easier for hackers to intercept data.</Text>
+                <Text style={{textAlign: 'center', fontFamily: 'Open-Sans'}}><Text style={{fontFamily: 'Open-Sans-Bold'}}>5. Public Wi-Fi Risks:</Text> Using unsecured public Wi-Fi networks, making it easier for hackers to intercept data.</Text>
             </View>
             <View style={[styles.boxContent, {borderLeftWidth: 5, borderRightWidth: 2, marginTop: 5}]}>
-                <Text style={{textAlign: 'center'}}><Text style={{fontWeight: 'bold'}}>6. Malware Infections:</Text> Downloading malicious software unknowingly, which can steal login information.</Text>
+                <Text style={{textAlign: 'center', fontFamily: 'Open-Sans'}}><Text style={{fontFamily: 'Open-Sans-Bold'}}>6. Malware Infections:</Text> Downloading malicious software unknowingly, which can steal login information.</Text>
             </View>
             <View style={[styles.boxContent, {borderLeftWidth: 5, borderRightWidth: 2, marginTop: 5}]}>
-                <Text style={{textAlign: 'center'}}><Text style={{fontWeight: 'bold'}}>7. Password Sharing:</Text> Sharing login credentials with others, even trusted individuals, can lead to breaches.</Text>
+                <Text style={{textAlign: 'center', fontFamily: 'Open-Sans'}}><Text style={{fontFamily: 'Open-Sans-Bold'}}>7. Password Sharing:</Text> Sharing login credentials with others, even trusted individuals, can lead to breaches.</Text>
             </View>
             <View style={[styles.boxContent, {borderLeftWidth: 5, borderRightWidth: 2, marginTop: 5}]}>
-                <Text style={{textAlign: 'center'}}><Text style={{fontWeight: 'bold'}}>8. Lack of Security Awareness:</Text> Not being aware of common online threats and safe online practices.</Text>
+                <Text style={{textAlign: 'center', fontFamily: 'Open-Sans'}}><Text style={{fontFamily: 'Open-Sans-Bold'}}>8. Lack of Security Awareness:</Text> Not being aware of common online threats and safe online practices.</Text>
             </View>
             <View style={[styles.boxContent, {borderLeftWidth: 5, borderRightWidth: 2, marginTop: 5}]}>
-                <Text style={{textAlign: 'center'}}><Text style={{fontWeight: 'bold'}}>9. Social Engineering:</Text> Falling for social engineering tactics where attackers manipulate users into revealing information.</Text>
+                <Text style={{textAlign: 'center', fontFamily: 'Open-Sans'}}><Text style={{fontFamily: 'Open-Sans-Bold'}}>9. Social Engineering:</Text> Falling for social engineering tactics where attackers manipulate users into revealing information.</Text>
             </View>
             <View style={[styles.boxContent, {borderLeftWidth: 5, borderRightWidth: 2, marginVertical: 5}]}>
-                <Text style={{textAlign: 'center'}}><Text style={{fontWeight: 'bold'}}>10. Data Breaches:</Text> Account information being exposed in data breaches from other services, which is then used to target other accounts.</Text>
+                <Text style={{textAlign: 'center', fontFamily: 'Open-Sans'}}><Text style={{fontFamily: 'Open-Sans-Bold'}}>10. Data Breaches:</Text> Account information being exposed in data breaches from other services, which is then used to target other accounts.</Text>
             </View>
             </ScrollView>
             </View>
@@ -143,7 +122,7 @@ const ViewItem3 = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#09055D',
+        backgroundColor: 'white',
     },
     header: {
         backgroundColor: 'white',
@@ -152,7 +131,8 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         flexDirection: 'row',
         alignItems: 'center',
-        elevation: 2,
+        elevation: 5,
+        marginTop: 5,
         justifyContent: 'space-between'
     },
     headerLeft: {
@@ -162,12 +142,12 @@ const styles = StyleSheet.create({
     passwordDetail: {
         fontSize: 20,
         marginHorizontal: 10,
-        fontWeight: 'bold'
+        fontFamily: 'Open-Sans-Bold'
     },
     mainContent: {
         backgroundColor: 'white',
         flex: 1,
-        elevation: 2,
+        elevation: 5,
         marginTop: 10,
         marginBottom: 20,
         marginHorizontal: 20,

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, Image, StyleSheet, FlatList, Switch, TouchableOpacity, ToastAndroid, BackHandler, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView, TextInput } from "react-native-gesture-handler";
 import { FIREBASE_FIRESTORE } from "../../../Firebaseconfig";
 import BottomSheet from 'react-native-raw-bottom-sheet';
@@ -9,7 +8,7 @@ import CryptoJS from 'crypto-js';
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as LocalAuthentication from 'expo-local-authentication';
 import { PLATFORM_IMAGES } from "../../utils/platformImages";
-import { getAuth, signOut, updateProfile } from "firebase/auth";
+import { getAuth, signOut } from "firebase/auth";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ProfileImageUpload from "./ProfileImageUpload";
@@ -18,9 +17,6 @@ import LoadingOverlay from "../../components/LoadingOverlay";
 
 const HomeScreen = () => {
 
-    //const randomBytes = CryptoJS.lib.WordArray.random(32);
-
-    //const secretKey = randomBytes.toString(CryptoJS.enc.Hex);
     const auth = getAuth();
     const user = auth.currentUser;
     const userUID = user ? user.uid : null;
@@ -33,6 +29,7 @@ const HomeScreen = () => {
     const [showPasswords, setShowPasswords] = useState({});
     const [isLoading, setIsLoading] = useState(false);
     const [isLoading2, setIsLoading2] = useState(false);
+    const [isEmpty, setIsEmpty] = useState('');
 
     const [sortMode, setSortMode] = useState('date'); 
     const [sortedAccounts, setSortedAccounts] = useState([]);
@@ -355,6 +352,7 @@ const HomeScreen = () => {
                 sortedData.sort((a, b) => a.title.localeCompare(b.title));
             }
             setSortedAccounts(sortedData);
+            setIsLoading(false);
         });
         return () => {
             unsubscribe();
@@ -367,12 +365,7 @@ const HomeScreen = () => {
         } else if (sortMode === 'alphabetical') {
             setSortMode('date');
         }
-    };
-
-    let imgSource = null;
-
-
-      
+    };   
 
     const renderItem = ({ item }) => (
         <View style={styles.itemList}>
@@ -403,7 +396,7 @@ const HomeScreen = () => {
                 resizeMode="contain"
                 />
                 <View style={{marginLeft: 5, maxWidth: 250}}>
-                    <Text style={{ fontSize: 15, marginBottom: 5, fontWeight: 'bold'}}>{item.title} Account</Text>
+                    <Text style={{ fontSize: 15, marginBottom: 5, fontFamily: 'Open-Sans-Bold'}}>{item.title} Account</Text>
                     <Text style={[styles.textBox]} multiline={false} numberOfLines={1}>{item.username}</Text>
                     {showPasswords[item.id] ? (
                         <TextInput>{item.password}</TextInput>
@@ -417,7 +410,7 @@ const HomeScreen = () => {
             <View style={{}}>
                 <TouchableOpacity onPress={() => handleSelectedItem(item)}>
                     <View>
-                        <Ionicons name="chevron-forward-circle" size={30} color="#244499" style={{marginHorizontal: 10}}/>
+                        <Ionicons name="chevron-forward-circle" size={30} color="black" style={{marginHorizontal: 10}}/>
                     </View>
                 </TouchableOpacity>
             </View>
@@ -427,15 +420,15 @@ const HomeScreen = () => {
 
 
     return (
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
             <View style={styles.header}>
                 <View style={styles.userInfo}>
                     <ProfileImageUpload/>
-                    <Text style={{fontSize: 15, color: 'white'}}>  Hi {userFirstName}</Text>
+                    <Text style={{fontSize: 15, color: 'black', fontFamily: 'Open-Sans'}}>  Hi <Text style={{fontFamily: 'Open-Sans-Bold'}}>{userFirstName}</Text></Text>
                 </View>
                 <View style={styles.iconHeader}>
                     <TouchableOpacity onPress={() => bottomSheetRef.current.open()}>
-                        <Ionicons name="settings-outline" size={25} color="white"/>
+                        <Ionicons name="settings-outline" size={24} color="black"/>
                     </TouchableOpacity>
                 </View>
                 
@@ -445,93 +438,91 @@ const HomeScreen = () => {
                     <View style={styles.item}>
                         <View style={{flexDirection: 'row'}}>
                         <Ionicons name="bulb-outline" size={20} color="orange"/>
-                        <Text style={{color: 'white'}}>Steps on how to create a strong password.</Text> 
+                        <Text style={{color: 'black', fontFamily: 'Open-Sans'}}>Create a strong password.</Text> 
                         </View>
                         <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto'}}>
                             <TouchableOpacity style={styles.button} onPress={item1}>
-                            <Text style={{color: 'white'}}>View</Text>
+                            <Text style={{color: 'black', fontFamily: 'Open-Sans'}}>View</Text>
                             </TouchableOpacity>
                             <View style={{flexDirection:'row', alignItems:'center'}}>
-                            <Ionicons name="heart-outline" size={22} color="white"/> 
-                            <Text style={{color: 'white'}}> {likeCount2}</Text>
+                            <Ionicons name="heart-outline" size={22} color="black"/> 
+                            <Text style={{color: 'black'}}> {likeCount2}</Text>
                             </View>
                         </View>
                     </View>
                     <View style={styles.item2}>
                         <View style={{flexDirection: 'row'}}>
                         <Ionicons name="bulb-outline" size={20} color="orange"/>
-                        <Text style={{color: 'white'}}>How to secure your account.</Text>
+                        <Text style={{color: 'black', fontFamily: 'Open-Sans'}}>How to secure your account.</Text>
                         </View>
                         <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto'}}>
                             <TouchableOpacity style={styles.button} onPress={item2}>
-                            <Text style={{color: 'white'}}>View</Text>
+                            <Text style={{color: 'black', fontFamily: 'Open-Sans'}}>View</Text>
                             </TouchableOpacity>
                             <View style={{flexDirection:'row', alignItems:'center'}}>
-                            <Ionicons name="heart-outline" size={22} color="white"/> 
-                            <Text style={{color: 'white'}}> {likeCount}</Text>
+                            <Ionicons name="heart-outline" size={22} color="black"/> 
+                            <Text style={{color: 'black'}}> {likeCount}</Text>
                             </View>
                         </View>
                     </View>
                     <View style={styles.item3}>
                         <View style={{flexDirection: 'row'}}>
                         <Ionicons name="bulb-outline" size={20} color="orange"/>
-                        <Text style={{color: 'white'}}>Most common reasons why account have been hacked.</Text>
+                        <Text style={{color: 'black', fontFamily: 'Open-Sans'}}>Most common reasons why account have been hacked.</Text>
                         </View>
                         <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto'}}>
                             <TouchableOpacity style={styles.button} onPress={item3}>
-                            <Text style={{color: 'white'}}>View</Text>
+                            <Text style={{color: 'black', fontFamily: 'Open-Sans'}}>View</Text>
                             </TouchableOpacity>
                             <View style={{flexDirection:'row', alignItems:'center'}}>
-                            <Ionicons name="heart-outline" size={22} color="white"/> 
-                            <Text style={{color: 'white'}}> {likeCount3}</Text>
+                            <Ionicons name="heart-outline" size={22} color="black"/> 
+                            <Text style={{color: 'black'}}> {likeCount3}</Text>
                             </View>
                         </View>
                     </View>
                 </ScrollView>
                 <View style={styles.searchContainer}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', flex: 1, borderWidth: 2, borderColor: '#6495ED', marginHorizontal: 5, paddingVertical: 3, borderRadius: 30, elevation: 2 }}>
-                    <Ionicons name="search-circle" size={40} color="#244499"/>
-                    <TextInput placeholder="Search" value={searchInput} onChangeText={setSearchInput} style={styles.searchInput}/>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', flex: 1, borderColor: '#FAAC33', marginHorizontal: 3, paddingHorizontal:5, paddingVertical: 3, borderRadius: 5, elevation: 5 }}>
+                    <Ionicons name="search-outline" size={24} color="black"/>
+                    <TextInput placeholder="Search by name, title..." value={searchInput} onChangeText={setSearchInput} style={styles.searchInput}/>
                     </View>
                 </View>
 
                 <View style={styles.crudContainer}>
-                        <TouchableOpacity onPress={handleItemAdd} style={{flexDirection: 'row', alignItems: 'center', borderRadius: 10, padding: 8, backgroundColor: '#244499'}}>
-                            <Ionicons name="add-circle-outline" size={22} color="white"/>
-                            <Text style={{color: 'white', fontSize: 13.5}}> Add account</Text>
+                        <TouchableOpacity onPress={handleItemAdd} style={{flexDirection: 'row', alignItems: 'center', borderRadius: 5, padding: 8, backgroundColor: 'white', elevation: 5}}>
+                            <Ionicons name="add-circle-outline" size={22} color="black"/>
+                            <Text style={{color: 'black', fontSize: 13.5, fontFamily: 'Open-Sans'}}> Add account</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={handleGenerate} style={{flexDirection: 'row', alignItems: 'center', borderRadius: 10, padding: 8, backgroundColor: '#CB362E'}}>
-                            <Ionicons name="key-outline" size={22} color="white"/>
-                            <Text style={{color: 'white', fontSize: 13.5}}> Generate Password</Text>
+                        <TouchableOpacity onPress={handleGenerate} style={{flexDirection: 'row', alignItems: 'center', borderRadius: 5, padding: 8, backgroundColor: 'white', elevation: 5}}>
+                            <Ionicons name="key-outline" size={22} color="black"/>
+                            <Text style={{color: 'black', fontSize: 13.5, fontFamily: 'Open-Sans'}}> Generate Password</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={handleHistory} style={{flexDirection: 'row', alignItems: 'center', borderRadius: 10, padding: 8, backgroundColor: '#018FF8'}}>
-                            <Ionicons name="timer-outline" size={22} color="white"/>
-                            <Text style={{color: 'white', fontSize: 13.5}}> View History</Text>
+                        <TouchableOpacity onPress={handleHistory} style={{flexDirection: 'row', alignItems: 'center', borderRadius: 5, padding: 8, backgroundColor: 'white', elevation: 5}}>
+                            <Ionicons name="timer-outline" size={22} color="black"/>
+                            <Text style={{color: 'black', fontSize: 13.5, fontFamily: 'Open-Sans'}}> View History</Text>
                         </TouchableOpacity>
                 </View>
 
 
                 <View style={styles.mainContent}>
-                    <View style={{alignItems: 'flex-start', marginTop: 20, marginHorizontal: 5, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                        <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>Saved Password</Text>
+                    <View style={{alignItems: 'flex-start', marginTop: 20, marginHorizontal: 5, marginBottom: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <Text style={{fontSize: 20, fontFamily: 'Open-Sans-Bold', color: 'black'}}>Saved Password</Text>
                         <TouchableOpacity onPress={toggleSortMode}>
-                            <Ionicons name="funnel-outline" size={20} color="white"/>
+                            <Ionicons name="filter-outline" size={20} color="black"/>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.listContent}>
                     {isLoading ? (
-                    
-                    //<ActivityIndicator size="small" color="#0000ff" />
                     <LoadingOverlay/>
-                    ) : (
-                    <> 
+                    ) : sortedAccounts.length === 0 ? (
+                        <Text style={{fontFamily: 'Open-Sans'}}>Add account to display here</Text>
+                    ) : ( 
                         <FlatList
                             data={sortedAccounts}
                             renderItem={renderItem}
                             keyExtractor={(item) => item.id}
                             showsVerticalScrollIndicator={false}
-                        />
-                    </> 
+                        /> 
                     )}
                     </View>
                 </View>
@@ -546,17 +537,17 @@ const HomeScreen = () => {
                     }}>
                     <View style={styles.bottomSheetContent}>
                         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                            <Text>Enable Biometric Authentication</Text>
+                            <Text style={{fontFamily: 'Open-Sans'}}>Enable Biometric Authentication</Text>
                             <Switch value={biometricEnabled}
                              onValueChange={toggleBiometricEnabled}/>
                         </View>
 
                         <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                            <Text>About the developer</Text>
+                            <Text style={{fontFamily: 'Open-Sans'}}>About the developer</Text>
                             <TouchableOpacity onPress={aboutDeveloper}>
                                 <Ionicons name="person-circle-outline" size={30}/>
                             </TouchableOpacity>
-                        </View>
+                        </View> 
                         
                         <TouchableOpacity style={{alignItems: 'flex-start', borderWidth: 1, alignItems: 'center', borderRadius: 20, marginHorizontal: 60, marginTop: 20}} onPress={handleLogout}>
                             <View style={{flexDirection: 'row', padding: 10, alignItems: 'center'}}>
@@ -565,7 +556,7 @@ const HomeScreen = () => {
                             ) : (
                             <> 
                             <Ionicons name="log-out-outline" size={20}/>
-                            <Text> Logout your account</Text>
+                            <Text style={{fontFamily: 'Open-Sans'}}> Logout your account</Text>
                             </>
                             )}
                             </View>
@@ -573,7 +564,7 @@ const HomeScreen = () => {
                     </View>
                 </BottomSheet>
         
-        </SafeAreaView>
+        </View>
         
     )
 };
@@ -581,7 +572,7 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#09055D'
+        backgroundColor: 'white'
     },
     image: {
         width: 50,
@@ -590,16 +581,13 @@ const styles = StyleSheet.create({
         marginLeft: 10,
     },
     header: {
-        backgroundColor: '#695BEE',
-        elevation: 2,
-        marginLeft: 10,
-        marginRight: 10,
+        backgroundColor: 'white',
         padding: 10, 
-        borderRadius: 20,
         color: 'black',
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        elevation: 5,
     },
     iconHeader: {
         flexDirection: 'row'
@@ -612,48 +600,57 @@ const styles = StyleSheet.create({
         flexDirection: 'row'
     },
     horizontalContainer: {
+        marginTop: 10,
         padding: 10,
-        marginRight: 7,
-        marginLeft: 2,
-        maxHeight: 123,
+        maxHeight: 128,
+        backgroundColor: 'white',
+        elevation: 5,
     },
     item3: {
-        width: 210,
+        width: 220,
         height: 100,
         padding: 15,
-        backgroundColor: '#2196E0',
+        backgroundColor: 'white',
+        marginTop: 3,
+        margin: 5,
         marginRight: 15,
-        borderRadius: 20,
+        borderRadius: 5,
         shadowColor: 'black',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
-        elevation: 2,
+        elevation: 5,
     },
     item2: {
-        width: 210,
+        width: 220,
         height: 100,
         padding: 15,
-        backgroundColor: '#CB362E',
+        backgroundColor: 'white',
+        marginTop: 3,
+        margin: 5,
         marginRight: 15,
-        borderRadius: 20,
+        borderRadius: 5,
         shadowColor: 'black',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
-        elevation: 2,
+        elevation: 5,
     },
     item: {
-        width: 210,
+        width: 220,
         height: 100,
         padding: 15,
-        backgroundColor: '#244499',
+        backgroundColor: 'white',
+        paddingRight: 20,
+        marginTop: 3,
+        margin: 5,
         marginRight: 15,
-        borderRadius: 20,
+        borderRadius: 5,
         shadowColor: 'black',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
-        elevation: 2,
+        elevation: 5,
     },
     searchContainer: {
+        marginTop: 5,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -669,7 +666,8 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         maxWidth: 200,
         padding: 5,
-        flex: 1
+        flex: 1,
+        fontFamily: 'Open-Sans'
       },
     
       sortIcon: {
@@ -679,7 +677,7 @@ const styles = StyleSheet.create({
       },
       button: {
         marginTop: 'auto',
-        borderColor: 'white',
+        borderColor: 'black',
         borderWidth: 1,
         borderRadius: 30,
         paddingLeft: 10,
@@ -692,12 +690,13 @@ const styles = StyleSheet.create({
         marginTop: 5,
         borderTopRightRadius: 30,
         borderTopLeftRadius: 30,
-        backgroundColor: '#695BEE',
+        backgroundColor: 'white',
+        elevation: 20,
         flex: 1,
+        paddingBottom: 5,
         paddingHorizontal: 20,
       },
       crudContainer: {
-        marginHorizontal: 10,
         alignSelf: 'stretch',
         justifyContent: 'space-between',
         flexDirection: 'row',
@@ -710,25 +709,29 @@ const styles = StyleSheet.create({
       listContent:{
         alignItems: 'center',
         marginTop: 10,
+        justifyContent: 'center',
         flex: 1
       },
       itemList: {
         width: 350,
         height: 90,
         borderLeftWidth: 5,
-        borderLeftColor: '#018FF8',
+        borderLeftColor: 'black',
         borderRightWidth: 2,
-        borderRightColor: '#018FF8',
+        borderRightColor: 'black',
         backgroundColor: 'white',
-        marginBottom: 10,
-        elevation: 5,
+        marginBottom: 5,
+        marginTop: 5,
+        elevation: 3,
         borderRadius: 20,
         shadowColor: 'black',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         alignItems: 'center',
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        borderTopWidth: 0.5,
+        borderTopColor: 'lightgray'
       },
       firstIcon: {
         color: '#018FF8',
@@ -748,6 +751,9 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         padding: 20,
       },
+      textBox: {
+        fontFamily: 'Open-Sans'
+      }
 });
 
 export default HomeScreen;

@@ -20,16 +20,18 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     container_PRIMARY: {
-        backgroundColor: '#018FF8'
+        backgroundColor: '#FAAC33'
     },
     container_SECONDARY: {
          
     },
     text: {
-        color: 'white'
+        color: 'white',
+        fontFamily: 'Open-Sans',
     },
     text_SECONDARY: {
-        color: 'white',
+        color: 'black',
+        fontFamily: 'Open-Sans'
     }
 
 });

@@ -18,13 +18,6 @@ const AddAccountScreen = () => {
 
     const auth = getAuth();
 
-    //const [fontLoaded] = useFonts({
-    //    OpenSans_400Regular, // Load the Open Sans font
-    //  })
-
-    const selectedItem = route.params?.selectedItem;
-
-    const [dropdownVisible, setDropdownVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
 
@@ -102,24 +95,6 @@ const AddAccountScreen = () => {
         });
     }
 
-    const toggleDropdown = () => {
-        setDropdownVisible(!dropdownVisible);
-    }
-    const handleTouchablePress = () => {
-        setDropdownVisible(false);
-    };
-
-    const deleteItem = async (itemId) => {
-        try {
-            
-            await deleteDoc(doc(FIREBASE_FIRESTORE, 'accounts', itemId));
-            
-            //setSortedAccounts((prevAccounts) => prevAccounts.filter((account) => account.id !== itemId));
-        } catch (error) {
-            console.error('Error deleting item:', error);
-        }
-    };
-
     const logHistory = async (action, timestamp) => {
         try {
           const user = auth.currentUser;
@@ -192,20 +167,6 @@ const AddAccountScreen = () => {
                     </TouchableOpacity>
                     <Text style={styles.passwordDetail}>Add Account</Text>
                 </View>
-                <Modal
-                    animationType="fade"
-                    transparent={true}
-                    visible={dropdownVisible}
-                    onRequestClose={toggleDropdown}>
-                    <TouchableOpacity style={styles.modalContainer} activeOpacity={11} onPress={handleTouchablePress}>
-                        <View style={styles.dropdownContainer}>
-                            <TouchableOpacity style={styles.dropdownItem} onPress={() => {setDropdownVisible(false); deleteItem(selectedItem.id); navigation.navigate('Home');}}>
-                                
-                                <Text style={styles.dropdownText}>Delete Account</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </TouchableOpacity>
-                </Modal>
             </View>
             <View style={styles.mainContent}>
 
@@ -243,29 +204,29 @@ const AddAccountScreen = () => {
                 </View>
                 <TouchableOpacity
                     onPress={handleAddAccount}>
-                <View style={{backgroundColor: 'transparent', marginVertical: 10 , alignItems: 'center', padding: 15, borderRadius: 30, backgroundColor: '#018FF8', flexDirection: 'row', justifyContent: 'center'}}>
+                <View style={{backgroundColor: 'transparent', marginVertical: 10 , alignItems: 'center', padding: 15, borderRadius: 30, backgroundColor: '#FAAC33', flexDirection: 'row', justifyContent: 'center'}}>
                     <View style={{color: 'white', flexDirection: 'row', alignItems: 'center'}}>
                     {isLoading ? (
                     <ActivityIndicator size="small" color="#FFFFFF" />
                     ) : (
                     <>  
                         <Ionicons name="add-circle-outline" color="white" size={20} style={{ marginRight: 5 }} />
-                        <Text style={{ color: 'white' }}>ADD</Text>
+                        <Text style={{ color: 'white', fontFamily: 'Open-Sans' }}>ADD</Text>
                     </>
                     )}
                     </View>
                 </View>
                 </TouchableOpacity>
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={{color: 'gray'}}>Password Strength: </Text>
+                <Text style={{color: 'gray', fontFamily: 'Open-Sans'}}>Password Strength: </Text>
                 {passwordStrength === 'Weak' && (
-                    <Text style={[styles.passwordStrengthWeak, styles.passwordStrengthIcon]}>Weak ✘</Text>
+                    <Text style={[styles.passwordStrengthWeak, styles.passwordStrengthIcon, {fontFamily: 'Open-Sans'}]}>Weak ✘</Text>
                 )}
                 {passwordStrength === 'Moderate' && (
-                    <Text style={[styles.passwordStrengthModerate, styles.passwordStrengthIcon]}> Moderate ⚠</Text>
+                    <Text style={[styles.passwordStrengthModerate, styles.passwordStrengthIcon, {fontFamily: 'Open-Sans'}]}> Moderate ⚠</Text>
                 )}
                 {passwordStrength === 'Strong' && (
-                    <Text style={[styles.passwordStrengthStrong, styles.passwordStrengthIcon]}> Strong ✔</Text>
+                    <Text style={[styles.passwordStrengthStrong, styles.passwordStrengthIcon, {fontFamily: 'Open-Sans'}]}> Strong ✔</Text>
                 )}
                 </View>
             </View>
@@ -277,7 +238,7 @@ const AddAccountScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#09055D',
+        backgroundColor: 'white',
     },
     header: {
         backgroundColor: 'white',
@@ -286,7 +247,8 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         flexDirection: 'row',
         alignItems: 'center',
-        elevation: 2,
+        marginTop: 5,
+        elevation: 5,
         justifyContent: 'space-between'
     },
     headerLeft: {
@@ -296,7 +258,7 @@ const styles = StyleSheet.create({
     passwordDetail: {
         fontSize: 20,
         marginHorizontal: 10,
-        fontWeight: 'bold'
+        fontFamily: 'Open-Sans-Bold'
     },
     image: {
     width: 50,
@@ -311,7 +273,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         marginHorizontal: 20,
         borderRadius: 20,
-        elevation: 2,
+        elevation: 5,
     },
     boxContent: {
         backgroundColor: '#F9F7F6',
@@ -356,6 +318,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         padding: 5,
         width: '80%',
+        fontFamily: 'Open-Sans'
     },
     inputBox: {
         flexDirection: 'row', 

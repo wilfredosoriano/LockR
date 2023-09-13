@@ -1,17 +1,18 @@
 import React, {useState} from "react";
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
 import { useForm } from 'react-hook-form';
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
-import { Ionicons } from "@expo/vector-icons";
 
 const EMAIL_REGEX = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/
 
 const ForgotPasswordScreen = () => {
 
     const navigation = useNavigation();
+    const [isLoading, setIsLoading] = useState(false);
+
     const { control, handleSubmit , formState: {errors}} = useForm();
     const auth = getAuth();
 
@@ -19,13 +20,17 @@ const ForgotPasswordScreen = () => {
     const [resetStatus, setResetStatus] = useState(null);
 
     const ConfirmButton = async (data) => {
+      setIsLoading(true);
       const { email } = data;
       try {
         await sendPasswordResetEmail(auth, email);
+
         setResetStatus("Password reset email sent successfully. Please check your email.");
       } catch (error) {
         console.log("Error sending password reset email:", error);
-        setResetStatus("Please enter the correct email and try again.");
+        setResetStatus("⚠ Please enter the correct email and try again.");
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -39,12 +44,18 @@ const ForgotPasswordScreen = () => {
         <View style={styles.registerContainer}>
         <Text style={styles.title}>Forgot Password</Text>
         <View style={{marginVertical: 10, flexDirection: 'row', marginHorizontal: 50}}>
-        {resetStatus && <Ionicons name="alert-circle" color="orange" size={25}/> && <Text style={{color: 'white', textAlign: 'center'}}>{resetStatus}</Text>}
+        {resetStatus && <Text style={{color: 'red', textAlign: 'center'}}>{resetStatus}</Text>}
         </View>
 
         <CustomInput name="email" placeholder="Email" value={email} control={control} rules={{required: 'Email is required*', pattern: {value: EMAIL_REGEX, message: 'Please enter a valid email address.'}}}/>
         
+        {isLoading ? (
+          <ActivityIndicator size="small" color="#FAAC33" style={{marginTop: 20}}/>
+          ) : (
+        <> 
         <CustomButton text="Confirm" onPress={handleSubmit(ConfirmButton)}/>
+        </>
+        )}
 
         <CustomButton text="Back to login" onPress={BackButton} type="SECONDARY"/>
         </View>
@@ -55,7 +66,7 @@ const ForgotPasswordScreen = () => {
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#09055D',
+      backgroundColor: 'white',
       justifyContent: 'center'
     },
     image: {
@@ -65,12 +76,15 @@ const styles = StyleSheet.create({
     },
     title: {
       marginTop: 20,
-      color: 'white',
+      color: '#FAAC33',
         fontSize: 30,
         marginBottom: 20,
+        fontFamily: 'Open-Sans-Bold'
+        
     },
     registerContainer: {
-      backgroundColor: '#695BEE',
+      backgroundColor: 'white',
+      elevation: 2,
       alignItems: 'center',
       borderRadius: 30,
       marginHorizontal: 20,

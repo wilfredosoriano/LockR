@@ -23,7 +23,7 @@ const CustomInput = ({control, name, rules = {}, placeholder, secureTextEntry}) 
                     />
                     </View>
                     {error && (
-                        <Text style={{color: 'orange', alignSelf: 'stretch', fontSize: 10, marginLeft: 20, marginBottom: 10}}>{error.message || 'Error'}</Text>
+                        <Text style={{color: 'orange', alignSelf: 'stretch', fontFamily: 'Open-Sans', fontSize: 10, marginLeft: 20, marginBottom: 10}}>{error.message || 'Error'}</Text>
                     )}
                 </>
             )}
@@ -38,10 +38,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         padding: 5,
         marginVertical: 5,
+        borderWidth: 1,
         borderColor: '#19162fff',
         backgroundColor: 'white'
     },
-    input:{},
+    input:{
+        fontFamily: 'Open-Sans',
+    },
 });
 
 export default CustomInput;
